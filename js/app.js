@@ -1,3 +1,4 @@
+
 (function ($) {
   var REQUESTS = [
     {
@@ -52,6 +53,94 @@
     // View initialization
     this.initializePages();
     this.initializeNavbarListeners();
+
+    var self = this;
+    this.mock('12223334444', function () {
+      console.log('mocked');
+      self.submit({ 'slide/life:bank/card' : 'hello' }, self.vendorUsers[0], self.forms[self.vendorUsers[0].uuid]['Mock'], function () {
+        console.log('submitted mock form');
+      });
+    });
+  };
+
+  SlideMobile.prototype.submit = function (fields, vendorUser, vendorForm, cb) {
+    var self = this;
+    new Slide.Conversation(
+      {type: 'vendor_form', upstream: vendorForm.id},
+      {type: 'user', downstream: self.user.number, key: self.user.publicKey}, //TODO: change user to vendor-user
+      function (conv) {
+        conv.submit(vendorUser.uuid, fields);
+        cb();
+      }
+    );
+  };
+
+  SlideMobile.prototype.mock = function (number, cb) {
+    var self = this;
+    //create vendor, create user, create vendoruser, create form, ...
+    Slide.User.register(number, function (user) {
+      console.log('user created', user);
+      self.user = user;
+      Slide.Vendor.invite('Mock vendor', function (vendor) {
+        vendor.register(function (vendor) {
+          console.log('vendor registered', vendor);
+          vendor.createForm('Mock', '', ['slide.life:base.phone-number'], function (vendorForm) {
+            console.log('mocked form created', vendorForm);
+            Slide.VendorUser.createRelationship(user, vendor, function (vendorUser) {
+              console.log('vendor user created', vendorUser);
+              self.vendorUsers = [vendorUser];
+              self.forms = {};
+              vendorUser.loadVendorForms(function (vendorForms) {
+                console.log('vendor forms incl mock loaded', vendorForms);
+                self.forms[vendorUser.uuid] = vendorForms;
+                console.log('here');
+                cb();
+              });
+            });
+          });
+        });
+      });
+    });
+  };
+
+  SlideMobile.prototype.loadUser = function (number, cb) {
+    if (this.user) cb(this.user);
+    else Slide.User.load(number, function (user) {
+      this.user = user;
+      cb(this.user);
+    });
+  };
+
+  SlideMobile.prototype.loadRelationships = function (number, cb) {
+    if (this.vendorUsers) cb(this.vendorUsers);
+    else this.loadUser(number, function (user) {
+      user.loadRelationships(function (vendorUsers) {
+        this.vendorUsers = vendorUsers;
+        cb(vendorUsers);
+      });
+    });
+  };
+
+  SlideMobile.prototype.loadForms = function (number, cb) {
+    if (this.forms) cb(this.forms);
+    else {
+      var deferreds = [];
+      this.forms = {};
+      this.loadRelationships(number, function (vendorUsers) {
+        vendorUsers.forEach(function (vendorUser) {
+          var deferred = new $.Deferred();
+          deferreds.push(deferred);
+          vendorUser.loadVendorForms(function (vendorForms) {
+            this.forms[vendorUser.uuid] = vendorForms;
+            deferred.resolve();
+          });
+        });
+      });
+
+      $.when.apply($, deferreds).done(function () {
+        cb(this.forms);
+      });
+    }
   };
 
   SlideMobile.prototype.initializePages = function () {
@@ -146,4 +235,3 @@
   var app = new SlideMobile();
   app.presentPage(app.$tabBar.find('.tab.active').data('target'));
 })($);
-
