@@ -1,0 +1,29 @@
+$nav-bar-height: 45px;
+
+.content .nav-bar {
+  height: $nav-bar-height;
+  line-height: $nav-bar-height;
+  padding: 0 12px;
+  background-color: #E7E7E7;
+}
+
+.content .nav-bar {
+  font-size: 14px;
+  text-align: center;
+}
+
+.content .nav-bar .back-button {
+  float: left;
+  cursor: pointer;
+  color: $bright-blue;
+}
+
+.content .nav-bar .back-button .glyphicon {
+  top: 2px;
+  position: relative;
+}
+
+.content .nav-bar .title {
+  font-weight: bold;
+  color: $dark-grey;
+}

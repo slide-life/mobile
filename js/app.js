@@ -1,4 +1,3 @@
-
 (function ($) {
   var REQUESTS = [
     {
@@ -163,23 +162,23 @@
     var self = this;
     var $requests = this.buildPage('requests', {
       requests: this.requests,
-      title: 'Requests'
+      title: 'Requests',
+      detail: {
+        back: true
+      }
     });
 
     $requests.on('click', '.list-item', function () {
       var request = self.requests[$(this).data('target')];
       var $detail = $requests.find('.page.detail');
-      Slide.Form.createFromIdentifiers($detail, request.fields, function (form) {
+      Slide.Form.createFromIdentifiers($detail.find('.body'), request.fields, function (form) {
         form.build(self.profile, {
           onSubmit: function () {
             self.popToMaster();
           }
         });
 
-        $detail.prepend(Handlebars.partials['nav-bar']({
-          title: request.form,
-          back: true
-        }));
+        self.updateNavbar($detail, { title: request.form, back: true });
         self.pushToDetail();
       });
     });
@@ -191,17 +190,23 @@
     var self = this;
     var $profile = this.buildPage('profile', {
       categories: this.categories,
-      title: 'Profile'
+      title: 'Profile',
+      detail: {
+        back: true
+      }
     });
 
     $profile.on('click', '.list-item', function () {
       var category = self.categories[$(this).data('target')];
-      Slide.Form.createFromIdentifiers($profile.find('.page.detail'), category.fields, function (form) {
+      var $detail = $profile.find('.page.detail');
+      Slide.Form.createFromIdentifiers($detail.find('.body'), category.fields, function (form) {
         form.build(self.profile, {
           onSubmit: function () {
             self.popToMaster();
           }
         });
+
+        self.updateNavbar($detail, { title: category.description, back: true });
         self.pushToDetail();
       });
     });
@@ -222,6 +227,11 @@
     this.$container.attr('data-page', page);
     this.$container.find('.content').removeClass('active');
     this.$container.find('.content[data-page=' + page + ']').addClass('active');
+  };
+
+  SlideMobile.prototype.updateNavbar = function ($page, options) {
+    var navBar = Handlebars.partials['nav-bar'](options);
+    $page.find('.nav-bar').replaceWith(navBar);
   };
 
   SlideMobile.prototype.getPage = function (page) {
