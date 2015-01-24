@@ -65,6 +65,9 @@ button {
 .container[data-page='3'] .content[data-page-id='3'] {
   display: block; }
 
+.field-input {
+  height: 100%; }
+
 /* Structure */
 /* Colours */
 .tab-bar {

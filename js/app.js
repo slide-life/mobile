@@ -14,8 +14,7 @@
       this.$container.append($template);
       return $template;
     }.bind(this));
-    this.presentTabBarView(this.contentViews[0]);
-
+    this.presentTabBarView(this.contentViews[$(".tab.active").index()]);
   };
 
   SlideMobile.prototype.presentTabBarView = function (target) {
