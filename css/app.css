@@ -50,6 +50,18 @@ button {
 .content.pushed #detail {
   left: 0; }
 
+.container .content {
+  display: none; }
+
+.container[data-page='1'] .content[data-page-id='1'] {
+  display: block; }
+
+.container[data-page='2'] .content[data-page-id='2'] {
+  display: block; }
+
+.container[data-page='3'] .content[data-page-id='3'] {
+  display: block; }
+
 /* Structure */
 /* Colours */
 .tab-bar {
