@@ -1,0 +1,94 @@
+/* Structure */
+/* Colours */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: 200; }
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0; }
+
+button {
+  outline: 0;
+  border: none;
+  background: none; }
+
+.container {
+  padding-bottom: 68px;
+  box-sizing: border-box; }
+
+.container, .content {
+  height: 100%;
+  width: 100%; }
+
+.content {
+  background-color: white;
+  overflow-y: scroll; }
+
+/* Structure */
+/* Colours */
+.tab-bar {
+  position: fixed;
+  height: 68px;
+  width: 100%;
+  bottom: 0;
+  border-top: 1px solid #C0C0C0;
+  background-color: #F3F3F3; }
+
+.tab {
+  width: 33.33%;
+  cursor: pointer;
+  float: left;
+  text-align: center;
+  height: 68px; }
+
+.tab .icon {
+  margin: 10.28571px auto 3.42857px auto;
+  float: none;
+  width: 50px;
+  height: 32px;
+  background-position: center;
+  background-repeat: no-repeat; }
+
+.tab .icon.requests {
+  background-image: url("../img/requests.svg"); }
+
+.tab.active .icon.requests {
+  background-image: url("../img/requests.active.svg"); }
+
+.tab .icon.profile {
+  background-image: url("../img/profile.svg"); }
+
+.tab.active .icon.profile {
+  background-image: url("../img/profile.active.svg"); }
+
+.tab .icon.relationships {
+  background-image: url("../img/relationships.svg"); }
+
+.tab.active .icon.relationships {
+  background-image: url("../img/relationships.active.svg"); }
+
+.tab .label {
+  color: #C0C0C0;
+  font-size: 12px;
+  font-size: 12px;
+  float: none; }
+
+.tab.active .label {
+  color: #5298FC; }
+
+.icon {
+  top: 2px;
+  width: 10px;
+  display: block;
+  width: 22px;
+  height: 16px;
+  margin-top: 1px;
+  margin-right: 6px;
+  background-repeat: no-repeat;
+  background-position: center;
+  float: left; }

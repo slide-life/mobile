@@ -1,0 +1,51 @@
+@import 'base';
+
+$icon-height: 32px;
+$label-height: 12px;
+$label-spacing: ($tab-bar-height - $icon-height - $label-height) / 7;
+
+.tab-bar {
+  position: fixed;
+  height: $tab-bar-height;
+  width: 100%;
+  bottom: 0;
+  border-top: 1px solid $medium-grey;
+  background-color: $light-grey;
+}
+
+.tab {
+  width: 33.33%;
+  cursor: pointer;
+  float: left;
+  text-align: center;
+  height: $tab-bar-height;
+}
+
+.tab .icon {
+  margin: ($label-spacing * 3) auto $label-spacing auto;
+  float: none;
+  width: 50px;
+  height: $icon-height;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.tab .icon.requests { background-image: url('../img/requests.svg'); }
+.tab.active .icon.requests { background-image: url('../img/requests.active.svg'); }
+
+.tab .icon.profile { background-image: url('../img/profile.svg'); }
+.tab.active .icon.profile { background-image: url('../img/profile.active.svg'); }
+
+.tab .icon.relationships { background-image: url('../img/relationships.svg'); }
+.tab.active .icon.relationships { background-image: url('../img/relationships.active.svg'); }
+
+.tab .label {
+  color: $medium-grey;
+  font-size: $label-height;
+  font-size: 12px;
+  float: none;
+}
+
+.tab.active .label {
+  color: $bright-blue;
+}
