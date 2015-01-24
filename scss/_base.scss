@@ -12,3 +12,29 @@ $bright-blue: #5298FC;
 $light-blue:  #6D808E;
 $medium-blue: #5A6B77;
 $dark-blue:   #475762;
+
+/* List view */
+
+.list-view .list-item {
+  font-size: 12px;
+  font-weight: bold;
+  margin: 12px;
+  border: 1px solid $medium-grey;
+  background-color: white;
+  height: 58px;
+  line-height: 58px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.list-view .list-item .title, .list-view .list-item .annotation {
+  margin: 0 12px;
+}
+
+.list-view .list-item .title {
+  float: left;
+}
+
+.list-view .list-item .annotation {
+  float: right;
+}

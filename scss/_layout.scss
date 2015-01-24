@@ -21,21 +21,21 @@ button {
   background: none;
 }
 
-.container, .content {
+.container {
   height: 100%;
-  width: 100%;
 }
 
 .content {
-  padding-bottom: $tab-bar-height;
   display: none;
+  height: 100%;
 }
+
 .content .page {
   width: 100%;
   height: 100%;
   background: red;
   overflow-y: scroll;
-  background-color: white;
+  background-color: $light-grey;
 }
 
 .page.master {

@@ -1,6 +1,13 @@
 <div class="content">
   <div class="master page">
-    <h1>Requests</h1>
+    <ul class="list-view">
+      {{#each requests}}
+        <li class="list-item" data-target={{@index}}>
+          <div class="title">{{form}}</div>
+          <div class="annotation"><span class="glyphicon glyphicon-menu-right"></span></div>
+        </li>
+      {{/each}}
+    </ul>
   </div>
   <div class="detail page">
     <h1>Detail</h1>
