@@ -15,10 +15,20 @@
       return $template;
     }.bind(this));
     this.presentTabBarView(this.contentViews[0]);
+
   };
 
   SlideMobile.prototype.presentTabBarView = function (target) {
     $(".container").attr("data-page", target.data("page-id"));
+    if( target.data("page-id") == 2 ) {
+      Slide.Form.createFromIdentifiers(this.contentViews[1].find(".master"), ['slide.life:bank.card'], function (form) {
+        form.build({}, {
+          onSubmit: function () {
+            cb(form);
+          }
+        });
+      });
+    }
   };
 
   SlideMobile.prototype.initializeNavbarListeners = function () {

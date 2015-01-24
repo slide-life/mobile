@@ -1,17 +1,17 @@
 this["SlideMobileTemplates"] = this["SlideMobileTemplates"] || {};
 
 this["SlideMobileTemplates"]["profile"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
-  return "<div class=\"content\">\n  <div id=\"master\" class=\"page\">\n    <h1>Profile</h1>\n  </div>\n  <div id=\"detail\" class=\"page\">\n    <h1>Detail</h1>\n  </div>\n</div>\n";
+  return "<div class=\"content\">\n  <div class=\"master page\">\n    <h1>Profile</h1>\n  </div>\n  <div class=\"detail page\">\n    <h1>Detail</h1>\n  </div>\n</div>\n";
   },"useData":true});
 
 
 
 this["SlideMobileTemplates"]["relationships"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
-  return "<div class=\"content\">\n  <div id=\"master\" class=\"page\">\n    <h1>Relationships</h1>\n  </div>\n  <div id=\"detail\" class=\"page\">\n    <h1>Detail</h1>\n  </div>\n</div>\n";
+  return "<div class=\"content\">\n  <div class=\"master page\">\n    <h1>Relationships</h1>\n  </div>\n  <div class=\"detail page\">\n    <h1>Detail</h1>\n  </div>\n</div>\n";
   },"useData":true});
 
 
 
 this["SlideMobileTemplates"]["requests"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
-  return "<div class=\"content\">\n  <div id=\"master\" class=\"page\">\n    <h1>Requests</h1>\n  </div>\n  <div id=\"detail\" class=\"page\">\n    <h1>Detail</h1>\n  </div>\n  </div>\n</div>\n";
+  return "<div class=\"content\">\n  <div class=\"master page\">\n    <h1>Requests</h1>\n  </div>\n  <div class=\"detail page\">\n    <h1>Detail</h1>\n  </div>\n  </div>\n</div>\n";
   },"useData":true});

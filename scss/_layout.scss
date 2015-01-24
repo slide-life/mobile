@@ -6,6 +6,7 @@ html, body {
   height: 100%;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 200;
+  overflow: hidden;
 }
 
 ul {
@@ -29,6 +30,7 @@ button {
   height: 100%;
   width: 100%;
   z-index: 1;
+  overflow: hidden;
 }
 
 .content {
@@ -40,15 +42,16 @@ button {
 .content .page {
   width: 100%;
   height: 100%;
+  overflow: scroll;
 }
 
-.page#master {
+.page.master {
   position: absolute;
   top: 0;
-  left: 0
+  left: 0;
 }
 
-.page#detail {
+.page.detail {
   position: absolute;
   top: 0;
   left: 104%;
