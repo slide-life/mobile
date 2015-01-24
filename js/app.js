@@ -4,49 +4,49 @@
     this.$tabBar = $('.tab-bar');
     this.templates = SlideMobileTemplates;
 
+    this.initializePages();
     this.initializeNavbarListeners();
-    this.contentViews = [].map.call(this.$tabBar.find('.tab'), function(tab) {
-      return $(tab).data('target');
-    }).map(function(target, i) {
-      var template = this.templates[target]();
-      var $template = $(template);
-      $template.attr("data-page-id", i+1);
-      this.$container.append($template);
-      return $template;
-    }.bind(this));
-    this.presentTabBarView(this.contentViews[$(".tab.active").index()]);
+    this.presentPage(this.$tabBar.find('.tab.active').data('target'));
   };
 
-  SlideMobile.prototype.presentTabBarView = function (target) {
-    $(".container").attr("data-page", target.data("page-id"));
-    if( target.data("page-id") == 2 ) {
-      Slide.Form.createFromIdentifiers(this.contentViews[1].find(".master"), ['slide.life:bank.card'], function (form) {
-        form.build({}, {
-          onSubmit: function () {
-            cb(form);
-          }
-        });
-      });
-    }
+  SlideMobile.prototype.initializePages = function () {
+    var self = this;
+    this.$tabBar.find('.tab').map(function () {
+      var page = $(this).data('target');
+      var $template = $(self.templates[page]());
+
+      $template.attr('data-page', page);
+
+      self.$container.append($template);
+    });
+  };
+
+  SlideMobile.prototype.presentPage = function (target) {
+    this.$container.attr('data-page', target);
+    this.$container.find('.content').removeClass('active');
+    this.$container.find('.content[data-page=' + target + ']').addClass('active');
+  };
+
+  SlideMobile.prototype.getActivePage = function () {
+    return this.$container.find('.content.active');
   };
 
   SlideMobile.prototype.initializeNavbarListeners = function () {
     var self = this;
     this.$tabBar.find('.tab').on('click', function () {
       $(this).addClass('active').siblings().removeClass('active');
-      self.presentTabBarView(self.contentViews[$(this).index()]);
+      self.presentPage($(this).data('target'));
     });
   };
 
-  SlideMobile.prototype.pushToDetail = function() {
-    this.$container.find('.content').addClass('pushed');
+  SlideMobile.prototype.pushToDetail = function () {
+    this.getActivePage().addClass('pushed');
   };
 
-  SlideMobile.prototype.popToMaster = function() {
-    this.$container.find('.content').removeClass('pushed');
+  SlideMobile.prototype.popToMaster = function () {
+    this.getActivePage().removeClass('pushed');
   };
 
   var app = new SlideMobile();
-  window.app = app;
 })($);
 

@@ -21,62 +21,51 @@ button {
   background: none;
 }
 
-.container {
-  padding-bottom: $tab-bar-height;
-  box-sizing: border-box;
-}
-
 .container, .content {
   height: 100%;
   width: 100%;
-  z-index: 1;
-  overflow: hidden;
 }
 
 .content {
-  background-color: white;
-  overflow-y: scroll;
-  width: 200%;
+  padding-bottom: $tab-bar-height;
+  display: none;
 }
-
 .content .page {
   width: 100%;
   height: 100%;
-  overflow: scroll;
+  background: red;
+  overflow-y: scroll;
+  background-color: white;
 }
 
 .page.master {
   position: absolute;
   top: 0;
   left: 0;
+  z-index: 1;
 }
 
 .page.detail {
   position: absolute;
   top: 0;
   left: 104%;
+  z-index: 2;
   box-shadow: 0 0 8px rgba(60, 60, 60, 0.4);
-  transition: left 0.5s ease;
+  transition: left 0.8s ease;
 }
 
-.content.pushed #detail {
+.content.pushed .detail {
   left: 0;
 }
 
 .container .content {
   display: none;
 }
-.container[data-page='1'] .content[data-page-id='1'] {
-  display: block;
-}
-.container[data-page='2'] .content[data-page-id='2'] {
-  display: block;
-}
-.container[data-page='3'] .content[data-page-id='3'] {
+
+.container .content.active {
   display: block;
 }
 
 .field-input {
   height: 100%;
 }
-
