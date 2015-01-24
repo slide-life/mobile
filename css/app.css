@@ -49,6 +49,8 @@ button {
 .content .page {
   width: 100%;
   height: 100%;
+  box-sizing: border-box;
+  padding-bottom: 80px;
   background: red;
   overflow-y: scroll;
   background-color: #F3F3F3; }
