@@ -19,7 +19,7 @@
   "trailing": true,
   "globals": {
     "Slide": true,
-    "SlideVendorTemplates": true,
+    "SlideMobileTemplates": true,
     "Handlebars": true
   }
 }

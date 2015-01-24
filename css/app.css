@@ -23,11 +23,32 @@ button {
 
 .container, .content {
   height: 100%;
-  width: 100%; }
+  width: 100%;
+  z-index: 1; }
 
 .content {
   background-color: white;
-  overflow-y: scroll; }
+  overflow-y: scroll;
+  width: 200%; }
+
+.content .page {
+  width: 100%;
+  height: 100%; }
+
+.page#master {
+  position: absolute;
+  top: 0;
+  left: 0; }
+
+.page#detail {
+  position: absolute;
+  top: 0;
+  left: 104%;
+  box-shadow: 0 0 8px rgba(60, 60, 60, 0.4);
+  transition: left 0.5s ease; }
+
+.content.pushed #detail {
+  left: 0; }
 
 /* Structure */
 /* Colours */
@@ -37,7 +58,8 @@ button {
   width: 100%;
   bottom: 0;
   border-top: 1px solid #C0C0C0;
-  background-color: #F3F3F3; }
+  background-color: #F3F3F3;
+  z-index: 2; }
 
 .tab {
   width: 33.33%;
