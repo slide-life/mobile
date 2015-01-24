@@ -26,6 +26,9 @@
             cb(form);
           }
         });
+        var sendBtn = form.$container.find(".send-button").detach();
+        console.log(sendBtn);
+        sendBtn.appendTo($(form.$container.find(".card.slick-slid:last-of-typee")));
       });
     }
   };
