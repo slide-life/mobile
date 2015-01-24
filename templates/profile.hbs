@@ -1,5 +1,6 @@
 <div class="content">
   <div class="master page">
+    {{> nav-bar this}}
     <ul class="list-view">
       {{#each categories}}
         <li class="list-item" data-target={{@key}}>
@@ -9,8 +10,5 @@
       {{/each}}
     </ul>
   </div>
-  <div class="detail page">
-    <h1>Detail</h1>
-  </div>
-  </div>
+  <div class="detail page"></div>
 </div>

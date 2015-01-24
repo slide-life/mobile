@@ -153,20 +153,33 @@
     $.each(this.pages, function (page, $html) {
       self.$container.append($html);
     });
+
+    this.$container.on('click', '.nav-bar .back-button', function () {
+      self.popToMaster();
+    });
   };
 
   SlideMobile.prototype.initializeRequests = function () {
     var self = this;
-    var $requests = this.buildPage('requests', { requests: this.requests });
+    var $requests = this.buildPage('requests', {
+      requests: this.requests,
+      title: 'Requests'
+    });
 
     $requests.on('click', '.list-item', function () {
       var request = self.requests[$(this).data('target')];
-      Slide.Form.createFromIdentifiers($requests.find('.page.detail'), request.fields, function (form) {
+      var $detail = $requests.find('.page.detail');
+      Slide.Form.createFromIdentifiers($detail, request.fields, function (form) {
         form.build(self.profile, {
           onSubmit: function () {
             self.popToMaster();
           }
         });
+
+        $detail.prepend(Handlebars.partials['nav-bar']({
+          title: request.form,
+          back: true
+        }));
         self.pushToDetail();
       });
     });
@@ -176,7 +189,10 @@
 
   SlideMobile.prototype.initializeProfile = function () {
     var self = this;
-    var $profile = this.buildPage('profile', { categories: this.categories });
+    var $profile = this.buildPage('profile', {
+      categories: this.categories,
+      title: 'Profile'
+    });
 
     $profile.on('click', '.list-item', function () {
       var category = self.categories[$(this).data('target')];

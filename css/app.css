@@ -48,7 +48,6 @@ button {
 
 .content .page {
   width: 100%;
-  height: 100%;
   background: red;
   overflow-y: scroll;
   background-color: #F3F3F3; }
@@ -78,81 +77,6 @@ button {
 
 .field-input {
   height: 100%; }
-
-/* Structure */
-/* Colours */
-/* List view */
-.list-view .list-item {
-  font-size: 12px;
-  font-weight: bold;
-  margin: 12px;
-  border: 1px solid #C0C0C0;
-  background-color: white;
-  height: 58px;
-  line-height: 58px;
-  border-radius: 4px;
-  cursor: pointer; }
-
-.list-view .list-item .title, .list-view .list-item .annotation {
-  margin: 0 12px; }
-
-.list-view .list-item .title {
-  float: left; }
-
-.list-view .list-item .annotation {
-  float: right; }
-
-.tab-bar {
-  position: fixed;
-  height: 68px;
-  width: 100%;
-  bottom: 0;
-  border-top: 1px solid #C0C0C0;
-  background-color: #F3F3F3;
-  opacity: 0.7;
-  z-index: 3; }
-
-.tab {
-  width: 33.33%;
-  cursor: pointer;
-  float: left;
-  text-align: center;
-  height: 68px; }
-
-.tab .icon {
-  margin: 10.28571px auto 3.42857px auto;
-  float: none;
-  width: 50px;
-  height: 32px;
-  background-position: center;
-  background-repeat: no-repeat; }
-
-.tab .icon.requests {
-  background-image: url("../img/requests.svg"); }
-
-.tab.active .icon.requests {
-  background-image: url("../img/requests.active.svg"); }
-
-.tab .icon.profile {
-  background-image: url("../img/profile.svg"); }
-
-.tab.active .icon.profile {
-  background-image: url("../img/profile.active.svg"); }
-
-.tab .icon.relationships {
-  background-image: url("../img/relationships.svg"); }
-
-.tab.active .icon.relationships {
-  background-image: url("../img/relationships.active.svg"); }
-
-.tab .label {
-  color: #C0C0C0;
-  font-size: 12px;
-  font-size: 12px;
-  float: none; }
-
-.tab.active .label {
-  color: #5298FC; }
 
 .icon {
   top: 2px;
@@ -967,3 +891,101 @@ button {
 
 .glyphicon-menu-up:before {
   content: '\e260'; }
+
+.content .nav-bar {
+  height: 45px;
+  line-height: 45px;
+  padding: 0 12px;
+  background-color: #E7E7E7; }
+
+.content .nav-bar {
+  font-size: 14px;
+  text-align: center; }
+
+.content .nav-bar .back-button {
+  float: left;
+  cursor: pointer;
+  color: #5298FC; }
+
+.content .nav-bar .back-button .glyphicon {
+  top: 2px;
+  position: relative; }
+
+.content .nav-bar .title {
+  font-weight: bold;
+  color: #1C1C1C; }
+
+/* Structure */
+/* Colours */
+/* List view */
+.list-view .list-item {
+  font-size: 12px;
+  font-weight: bold;
+  margin: 12px;
+  border: 1px solid #C0C0C0;
+  background-color: white;
+  height: 58px;
+  line-height: 58px;
+  border-radius: 4px;
+  cursor: pointer; }
+
+.list-view .list-item .title, .list-view .list-item .annotation {
+  margin: 0 12px; }
+
+.list-view .list-item .title {
+  float: left; }
+
+.list-view .list-item .annotation {
+  float: right; }
+
+.tab-bar {
+  position: fixed;
+  height: 68px;
+  width: 100%;
+  bottom: 0;
+  border-top: 1px solid #C0C0C0;
+  background-color: #F3F3F3;
+  opacity: 0.7;
+  z-index: 3; }
+
+.tab {
+  width: 33.33%;
+  cursor: pointer;
+  float: left;
+  text-align: center;
+  height: 68px; }
+
+.tab .icon {
+  margin: 10.28571px auto 3.42857px auto;
+  float: none;
+  width: 50px;
+  height: 32px;
+  background-position: center;
+  background-repeat: no-repeat; }
+
+.tab .icon.requests {
+  background-image: url("../img/requests.svg"); }
+
+.tab.active .icon.requests {
+  background-image: url("../img/requests.active.svg"); }
+
+.tab .icon.profile {
+  background-image: url("../img/profile.svg"); }
+
+.tab.active .icon.profile {
+  background-image: url("../img/profile.active.svg"); }
+
+.tab .icon.relationships {
+  background-image: url("../img/relationships.svg"); }
+
+.tab.active .icon.relationships {
+  background-image: url("../img/relationships.active.svg"); }
+
+.tab .label {
+  color: #C0C0C0;
+  font-size: 12px;
+  font-size: 12px;
+  float: none; }
+
+.tab.active .label {
+  color: #5298FC; }
