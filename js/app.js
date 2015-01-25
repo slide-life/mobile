@@ -58,13 +58,21 @@
     var self = this;
     var number = '16144408217';
     Slide.User.load(number, function(user) {
-      console.log(user);
-      user.listen(function(form) {
-        var vendorForm = form;
-        var row = $('.list-item').eq(0).clone();
-        row.find('.title').text(form.name);
-        row.prependTo('.list-view');
-        // TODO: open conversation with VendorForm
+      user.listen(function(payload) {
+        var vendorUUID = payload.vendorUser;
+        var vendorForm = payload.form;
+        new Slide.VendorUser(vendorUUID).load(function(vendorUser) {
+          var row = $('.list-item').eq(0).clone();
+          row.find('.title').text(payload.form.name);
+          row.prependTo('.list-view');
+          // TODO: open conversation with VendorForm
+           new Slide.Conversation(
+            {type: 'form', upstream: vendorForm.id },
+            {type: 'vendor_user', downstream: vendorUser.uuid, key: vendorUser.public_key},
+            function(conv) {
+              conv.submit(vendorUser.uuid, {'slide/life:bank/card': 'hello'});
+            });
+        });
       });
     });
 
