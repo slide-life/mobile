@@ -126,9 +126,9 @@
   SlideMobile.prototype.initializePages = function () {
     var self = this;
 
-    this.pages.requests = this.initializeRequestsView();
-    this.pages.profile = this.initializeProfileView();
-    this.pages.relationships = this.initializeRelationshipsView();
+    this.pages.requests = this.initializeRequestsPage();
+    this.pages.profile = this.initializeProfilePage();
+    this.pages.relationships = this.initializeRelationshipsPage();
 
     $.each(this.pages, function (page, $html) {
       self.$container.append($html);
@@ -139,19 +139,17 @@
     });
   };
 
-  SlideMobile.prototype.initializeRequestsView = function () {
+  SlideMobile.prototype.initializeRequestsPage = function () {
     var self = this;
     var $requests = this.buildPage('requests', {
       requests: this.requests,
-      title: 'Requests',
-      detail: {
-        back: true
-      }
+      title: 'Requests'
     });
 
+    var $master = $requests.find('.page.master');
+    var $detail = $requests.find('.page.detail');
     $requests.on('click', '.list-item', function () {
       var request = self.requests[$(this).data('target')];
-      var $detail = $requests.find('.page.detail');
       Slide.Form.createFromIdentifiers($detail.find('.body'), request.fields, function (form) {
         form.build(self.profile, {
           onSubmit: function () {
@@ -167,19 +165,17 @@
     return $requests;
   };
 
-  SlideMobile.prototype.initializeProfileView = function () {
+  SlideMobile.prototype.initializeProfilePage = function () {
     var self = this;
     var $profile = this.buildPage('profile', {
       categories: this.categories,
-      title: 'Profile',
-      detail: {
-        back: true
-      }
+      title: 'Profile'
     });
 
-    $profile.on('click', '.list-item', function () {
+    var $master = $profile.find('.page.master');
+    var $detail = $profile.find('.page.detail');
+    $master.on('click', '.list-item', function () {
       var category = self.categories[$(this).data('target')];
-      var $detail = $profile.find('.page.detail');
       Slide.Form.createFromIdentifiers($detail.find('.body'), category.fields, function (form) {
         form.build(self.profile, {
           onSubmit: function () {
@@ -195,8 +191,24 @@
     return $profile;
   };
 
-  SlideMobile.prototype.initializeRelationshipsView = function () {
-    // TODO
+  SlideMobile.prototype.initializeRelationshipsPage = function () {
+    var self = this;
+    var $relationships = this.buildPage('relationships', {
+      title: 'Relationships',
+      detail: {
+        back: true
+      }
+    });
+
+    var $master = $relationships.find('.page.master');
+    var $detail = $relationships.find('.page.detail');
+    $master.on('click', '.list-item', function () {
+      var $detail = $relationships.find('.page.detail');
+      self.updateNavbar($detail, { title: $(this).text(), back: true });
+      self.pushToDetail();
+    });
+
+    return $relationships;
   };
 
   SlideMobile.prototype.buildPage = function (page, data) {

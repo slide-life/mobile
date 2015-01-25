@@ -34,8 +34,14 @@ this["SlideMobileTemplates"]["profile"] = Handlebars.template({"1":function(dept
 
 
 this["SlideMobileTemplates"]["relationships"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
-  return "<div class=\"content\">\n  <div class=\"master page\">\n    <div class=\"header\">\n      <span class=\"title\">Relationships</span>\n    </div>\n    sdf\n  </div>\n  <div class=\"detail page\">\n    <h1>Detail</h1>\n  </div>\n</div>\n";
-  },"useData":true});
+  var stack1, buffer = "<div class=\"content\">\n  <div class=\"master page\">\n";
+  stack1 = this.invokePartial(partials['nav-bar'], '    ', 'nav-bar', depth0, undefined, helpers, partials, data);
+  if (stack1 != null) { buffer += stack1; }
+  buffer += "    <ul class=\"list-view\">\n      <li class=\"list-item\">\n        <div class=\"title\"><img class=\"relationship-icon\" src=\"img/mock-relationships/coop.png\">The COOP</div>\n        <div class=\"annotation\"><span class=\"glyphicon glyphicon-menu-right\"></span></div>\n      </li>\n      <li class=\"list-item\">\n        <div class=\"title\"><img class=\"relationship-icon\" src=\"img/mock-relationships/hsa.png\">Harvard Student Agencies</div>\n        <div class=\"annotation\"><span class=\"glyphicon glyphicon-menu-right\"></span></div>\n      </li>\n      <li class=\"list-item\">\n        <div class=\"title\"><img class=\"relationship-icon\" src=\"img/mock-relationships/metlife.png\">MetLife</div>\n        <div class=\"annotation\"><span class=\"glyphicon glyphicon-menu-right\"></span></div>\n      </li>\n    </ul>\n  </div>\n  <div class=\"detail page\">\n";
+  stack1 = this.invokePartial(partials['nav-bar'], '    ', 'nav-bar', depth0, undefined, helpers, partials, data);
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "    <h5 class=\"relationships-title\">Pending requests</h5>\n    <ul class=\"list-view\">\n      <li class=\"list-item\">\n        <div class=\"title\">Promotions</div>\n        <div class=\"annotation\">25/01/2015</div>\n      </li>\n    </ul>\n    <h5 class=\"relationships-title\">Organisation profile</h5>\n    <ul class=\"list-view\">\n      <li class=\"list-item\">\n        <div class=\"title\">Account number</div>\n        <div class=\"annotation\">1212-5123-1231</div>\n      </li>\n      <li class=\"list-item\">\n        <div class=\"title\">Personal sales assistant</div>\n        <div class=\"annotation\">Heidi: (828) 972-4261</div>\n      </li>\n    </ul>\n    <h5 class=\"relationships-title\">Relationship history</h5>\n    <ul class=\"list-view\">\n      <li class=\"list-item\">\n        <div class=\"title\">Web form</div>\n        <div class=\"annotation\">24/01/2015</div>\n      </li>\n      <li class=\"list-item\">\n        <div class=\"title\">Account renewal form</div>\n        <div class=\"annotation\">27/12/2014</div>\n      </li>\n      <li class=\"list-item\">\n        <div class=\"title\">Signup form</div>\n        <div class=\"annotation\">16/08/2014</div>\n      </li>\n    </ul>\n  </div>\n</div>\n";
+},"usePartial":true,"useData":true});
 
 
 

@@ -992,3 +992,11 @@ button {
 
 .tab.active .label {
   color: #5298FC; }
+
+.relationship-icon {
+  margin-right: 6px;
+  top: 8px;
+  position: relative; }
+
+.relationships-title {
+  margin: 12px; }
