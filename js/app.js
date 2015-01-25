@@ -70,8 +70,9 @@
   // };
 
   SlideMobile.prototype.initializeRequests = function (cb) {
+    var self = this;
     this.getRequests('12223334444', function (requests) { // TODO: rely on user.load/register
-      this.requests = requests;
+      self.requests = requests;
       cb();
     });
   };
