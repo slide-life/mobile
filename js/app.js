@@ -58,6 +58,9 @@
     var self = this;
     var number = '16144408217';
     Slide.User.load(number, function(user) {
+      user.getProfile(function (profile) {
+        self.profile = Slide.User.deserializeProfile(profile);
+      });
       user.listen(function(payload) {
         var vendorUUID = payload.vendorUser;
         var vendorForm = payload.form;
@@ -184,6 +187,8 @@
     var $detail = $requests.find('.page.detail');
     $requests.on('click', '.list-item', function () {
       var request = self.requests[$(this).data('target')];
+      console.log(self.requests);
+      console.log($(this).data('target'));
       Slide.Form.createFromIdentifiers($detail.find('.body'), request.fields, function (form) {
         form.build(self.profile, {
           onSubmit: function () {
@@ -213,6 +218,10 @@
       Slide.Form.createFromIdentifiers($detail.find('.body'), category.fields, function (form) {
         form.build(self.profile, {
           onSubmit: function () {
+            var serializedPatch = Slide.User.serializeProfile(form.getPatchedUserData());
+            self.user.patchProfile(serializedPatch, function (profile) {
+              self.profile = profile;
+            });
             self.popToMaster();
           }
         });
