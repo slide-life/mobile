@@ -54,11 +54,37 @@
     this.initializeNavbarListeners();
 
     var self = this;
-    this.mock('12223334444', function () {
-      console.log('mocked');
-      self.submit({ 'slide/life:bank/card' : 'hello' }, self.vendorUsers[0], self.forms[self.vendorUsers[0].uuid]['Mock'], function () {
-        console.log('submitted mock form');
+    var number = '16144408217';
+    Slide.User.load(number, function(user) {
+      console.log(user);
+      user.listen(function(form) {
+        var vendorForm = form;
+        var row = $('.list-item').eq(0).clone();
+        row.find('.title').text(form.name);
+        row.prependTo('.list-view');
+        // TODO: open conversation with VendorForm
       });
+    });
+
+    this.getFormList(number, function(forms) {
+      console.log('forms', forms);
+    });
+  };
+
+  SlideMobile.prototype.getFormList = function(number, cb) {
+    var self = this;
+    this.loadForms(number, function(forms) {
+      self.requests = [];
+      for (vendorUserUuid in forms) {
+        vendorUserForms = forms[vendorUserUuid];
+        for (formName in vendorUserForms) {
+          self.requests.push({
+            form: formName,
+            fields: vendorUserForms[formName].fields
+          });
+        }
+      }
+      cb(self.requests);
     });
   };
 
@@ -77,28 +103,8 @@
   SlideMobile.prototype.mock = function (number, cb) {
     var self = this;
     //create vendor, create user, create vendoruser, create form, ...
-    Slide.User.register(number, function (user) {
-      console.log('user created', user);
-      self.user = user;
-      Slide.Vendor.invite('Mock vendor', function (vendor) {
-        vendor.register(function (vendor) {
-          console.log('vendor registered', vendor);
-          vendor.createForm('Mock', '', ['slide.life:base.phone-number'], function (vendorForm) {
-            console.log('mocked form created', vendorForm);
-            Slide.VendorUser.createRelationship(user, vendor, function (vendorUser) {
-              console.log('vendor user created', vendorUser);
-              self.vendorUsers = [vendorUser];
-              self.forms = {};
-              vendorUser.loadVendorForms(function (vendorForms) {
-                console.log('vendor forms incl mock loaded', vendorForms);
-                self.forms[vendorUser.uuid] = vendorForms;
-                console.log('here');
-                cb();
-              });
-            });
-          });
-        });
-      });
+    Slide.User.load(number, function(user) {
+      console.log(user);
     });
   };
 
