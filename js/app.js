@@ -34,6 +34,7 @@
     this.profile = {};
     this.requests = [];
     this.user = {};
+    this.currentVendorUser = {};
 
     // View logic
     this.$container = $('.container');
@@ -42,26 +43,27 @@
     this.pages = {};
 
     var self = this;
-    var number = '18572344988';
+    var number = '16144408217';
     Slide.User.load(number, function (user) {
       self.user = user;
 
       user.getProfile(function (profile) {
-        self.profile = Slide.User.deserializeProfile(profile);
+        console.log('profile', profile);
+        // self.profile = Slide.User.deserializeProfile(profile);
         self.getRequests(number, function (requests) {
           self.requests = requests;
+          // Notification Listeners
+          self.bindPushNotificationListeners();
+
+          // View initialization
+          self.initializePages();
+          self.initializeNavbarListeners();
+
+          // Initialization finished
+          cb();
         });
       });
 
-      // Notification Listeners
-      self.bindPushNotificationListeners();
-
-      // View initialization
-      self.initializePages();
-      self.initializeNavbarListeners();
-
-      // Initialization finished
-      cb();
     });
   };
 
@@ -70,6 +72,8 @@
     this.user.listen(function (payload) {
       var vendorUUID = payload.vendorUser;
       var vendorForm = payload.form;
+
+      self.user.addRequest(vendorUUID);
 
       self.requests.push({ form: vendorForm.name, fields: vendorForm.fields });
       self.replacePage('requests', {
@@ -132,6 +136,7 @@
     if (this.vendorUsers) {
       cb(this.vendorUsers)
     } else {
+      var self = this;
       this.loadUser(number, function (user) {
         user.loadRelationships(function (vendorUsers) {
           this.vendorUsers = vendorUsers;
@@ -147,20 +152,22 @@
     } else {
       var deferreds = [];
       this.forms = {};
+      var self = this;
       this.loadRelationships(number, function (vendorUsers) {
-        console.log(number, vendorUsers);
         vendorUsers.forEach(function (vendorUser) {
           var deferred = new $.Deferred();
           deferreds.push(deferred);
+          console.log('user', vendorUser);
           vendorUser.loadVendorForms(function (vendorForms) {
-            this.forms[vendorUser.uuid] = vendorForms;
+            self.forms[vendorUser.uuid] = vendorForms;
+            self.currentVendorUser = vendorUser;
             deferred.resolve();
           });
         });
-      });
 
-      $.when.apply($, deferreds).done(function () {
-        cb(this.forms);
+        $.when.apply($, deferreds).done(function () {
+          cb(self.forms);
+        });
       });
     }
   };
@@ -191,6 +198,7 @@
     var $master = $requests.find('.page.master');
     var $detail = $requests.find('.page.detail');
     $requests.on('click', '.list-item', function () {
+      console.log('click');
       var request = self.requests[$(this).data('target')];
       Slide.Form.createFromIdentifiers($detail.find('.body'), request.fields, function (form) {
         form.build(self.profile, {
@@ -307,6 +315,7 @@
 
   SlideMobile.prototype.getRequests = function (number, cb) {
     this.loadForms(number, function (forms) {
+      console.log('loaded', forms);
       var requests = [];
       for (vendorUserUUID in forms) {
         vendorUserForms = forms[vendorUserUUID];
