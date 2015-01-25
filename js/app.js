@@ -1,14 +1,14 @@
 (function ($) {
-  var REQUESTS = [
-    {
-      form: 'The Coop Signup',
-      fields: ['name', 'address', 'bank.card']
-    },
-    {
-      form: 'Insomnia Cookies Loyalty',
-      fields: ['name', 'email', 'mobile-phone']
-    }
-  ];
+  // var REQUESTS = [
+  //   {
+  //     form: 'The Coop Signup',
+  //     fields: ['name', 'address', 'bank.card']
+  //   },
+  //   {
+  //     form: 'Insomnia Cookies Loyalty',
+  //     fields: ['name', 'email', 'mobile-phone']
+  //   }
+  // ];
 
   var CATEGORIES = {
     banking: {
@@ -38,91 +38,72 @@
   };
 
   var SlideMobile = function () {
+    var self = this;
+
     // Data
     this.categories = CATEGORIES;
     this.profile = {};
-    this.requests = REQUESTS;
+    this.initializeRequests(function () {
+      // View logic
+      self.$container = $('.container');
+      self.$tabBar = $('.tab-bar');
+      self.templates = SlideMobileTemplates;
+      self.pages = {};
 
-    // View logic
-    this.$container = $('.container');
-    this.$tabBar = $('.tab-bar');
-    this.templates = SlideMobileTemplates;
-    this.pages = {};
-
-    // View initialization
-    this.initializePages();
-    this.initializeNavbarListeners();
-
-    var self = this;
-    this.mock('12223334444', function () {
-      console.log('mocked');
-      self.submit({ 'slide/life:bank/card' : 'hello' }, self.vendorUsers[0], self.forms[self.vendorUsers[0].uuid]['Mock'], function () {
-        console.log('submitted mock form');
-      });
+      // View initialization
+      self.initializePages();
+      self.initializeNavbarListeners();
     });
+
   };
 
-  SlideMobile.prototype.submit = function (fields, vendorUser, vendorForm, cb) {
-    var self = this;
-    new Slide.Conversation(
-      {type: 'vendor_form', upstream: vendorForm.id},
-      {type: 'user', downstream: self.user.number, key: self.user.publicKey}, //TODO: change user to vendor-user
-      function (conv) {
-        conv.submit(vendorUser.uuid, fields);
-        cb();
-      }
-    );
-  };
+  // SlideMobile.prototype.submit = function (fields, vendorUser, vendorForm, cb) {
+  //   var self = this;
+  //   new Slide.Conversation(
+  //     {type: 'vendor_form', upstream: vendorForm.id},
+  //     {type: 'user', downstream: self.user.number, key: self.user.publicKey}, //TODO: change user to vendor-user
+  //     function (conv) {
+  //       conv.submit(vendorUser.uuid, fields);
+  //       cb();
+  //     }
+  //   );
+  // };
 
-  SlideMobile.prototype.mock = function (number, cb) {
-    var self = this;
-    //create vendor, create user, create vendoruser, create form, ...
-    Slide.User.register(number, function (user) {
-      console.log('user created', user);
-      self.user = user;
-      Slide.Vendor.invite('Mock vendor', function (vendor) {
-        vendor.register(function (vendor) {
-          console.log('vendor registered', vendor);
-          vendor.createForm('Mock', '', ['slide.life:base.phone-number'], function (vendorForm) {
-            console.log('mocked form created', vendorForm);
-            Slide.VendorUser.createRelationship(user, vendor, function (vendorUser) {
-              console.log('vendor user created', vendorUser);
-              self.vendorUsers = [vendorUser];
-              self.forms = {};
-              vendorUser.loadVendorForms(function (vendorForms) {
-                console.log('vendor forms incl mock loaded', vendorForms);
-                self.forms[vendorUser.uuid] = vendorForms;
-                console.log('here');
-                cb();
-              });
-            });
-          });
-        });
-      });
+  SlideMobile.prototype.initializeRequests = function (cb) {
+    this.getRequests('12223334444', function (requests) { // TODO: rely on user.load/register
+      this.requests = requests;
+      cb();
     });
   };
 
   SlideMobile.prototype.loadUser = function (number, cb) {
-    if (this.user) cb(this.user);
-    else Slide.User.load(number, function (user) {
-      this.user = user;
+    if (this.user) {
       cb(this.user);
-    });
+    } else {
+      Slide.User.load(number, function (user) {
+        this.user = user;
+        cb(this.user);
+      });
+    }
   };
 
   SlideMobile.prototype.loadRelationships = function (number, cb) {
-    if (this.vendorUsers) cb(this.vendorUsers);
-    else this.loadUser(number, function (user) {
-      user.loadRelationships(function (vendorUsers) {
-        this.vendorUsers = vendorUsers;
-        cb(vendorUsers);
+    if (this.vendorUsers) {
+      cb(this.vendorUsers)
+    } else {
+      this.loadUser(number, function (user) {
+        user.loadRelationships(function (vendorUsers) {
+          this.vendorUsers = vendorUsers;
+          cb(vendorUsers);
+        });
       });
-    });
+    }
   };
 
   SlideMobile.prototype.loadForms = function (number, cb) {
-    if (this.forms) cb(this.forms);
-    else {
+    if (this.forms) {
+      cb(this.forms);
+    } else {
       var deferreds = [];
       this.forms = {};
       this.loadRelationships(number, function (vendorUsers) {
@@ -145,9 +126,9 @@
   SlideMobile.prototype.initializePages = function () {
     var self = this;
 
-    this.pages.requests = this.initializeRequests();
-    this.pages.profile = this.initializeProfile();
-    this.pages.relationships = this.initializeRelationships();
+    this.pages.requests = this.initializeRequestsView();
+    this.pages.profile = this.initializeProfileView();
+    this.pages.relationships = this.initializeRelationshipsView();
 
     $.each(this.pages, function (page, $html) {
       self.$container.append($html);
@@ -158,7 +139,7 @@
     });
   };
 
-  SlideMobile.prototype.initializeRequests = function () {
+  SlideMobile.prototype.initializeRequestsView = function () {
     var self = this;
     var $requests = this.buildPage('requests', {
       requests: this.requests,
@@ -186,7 +167,7 @@
     return $requests;
   };
 
-  SlideMobile.prototype.initializeProfile = function () {
+  SlideMobile.prototype.initializeProfileView = function () {
     var self = this;
     var $profile = this.buildPage('profile', {
       categories: this.categories,
@@ -214,7 +195,8 @@
     return $profile;
   };
 
-  SlideMobile.prototype.initializeRelationships = function () {
+  SlideMobile.prototype.initializeRelationshipsView = function () {
+    // TODO
   };
 
   SlideMobile.prototype.buildPage = function (page, data) {
@@ -249,6 +231,23 @@
       self.presentPage($(this).data('target'));
     });
   };
+
+  SlideMobile.prototype.getRequests = function (number, cb) {
+    this.loadForms(number, function (forms) {
+      var requests = [];
+      for (vendorUserUUID in forms) {
+        vendorUserForms = forms[vendorUserUUID];
+        for (formName in vendorUserForms) {
+          requests.push({
+            form: formName,
+            fields: vendorUserForms[formName].fields
+          });
+        }
+      }
+      cb(requests);
+     });
+   };
+
 
   SlideMobile.prototype.pushToDetail = function () {
     this.getActivePage().addClass('pushed');
