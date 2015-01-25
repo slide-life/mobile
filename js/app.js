@@ -48,8 +48,8 @@
 
       user.getProfile(function (profile) {
         self.profile = Slide.User.deserializeProfile(profile);
-        self.getRequests(number, function(forms) {
-          self.forms = forms;
+        self.getRequests(number, function (requests) {
+          self.requests = requests;
         });
       });
 
@@ -72,8 +72,8 @@
       var vendorForm = payload.form;
 
       self.requests.push({ form: vendorForm.name, fields: vendorForm.fields });
-      self.updatePage('requests', {
-        requests: this.requests,
+      self.replacePage('requests', {
+        requests: self.requests,
         title: 'Requests'
       });
 
@@ -148,6 +148,7 @@
       var deferreds = [];
       this.forms = {};
       this.loadRelationships(number, function (vendorUsers) {
+        console.log(number, vendorUsers);
         vendorUsers.forEach(function (vendorUser) {
           var deferred = new $.Deferred();
           deferreds.push(deferred);
@@ -176,7 +177,7 @@
     });
 
     this.$container.on('click', '.nav-bar .back-button', function () {
-      self.popToMaster();
+      self.popActivePageToMaster();
     });
   };
 
@@ -194,12 +195,12 @@
       Slide.Form.createFromIdentifiers($detail.find('.body'), request.fields, function (form) {
         form.build(self.profile, {
           onSubmit: function () {
-            self.popToMaster();
+            self.popActivePageToMaster();
           }
         });
 
         self.updateNavbar($detail, { title: request.form, back: true });
-        self.pushToDetail();
+        self.pushActivePageToDetail();
       });
     });
 
@@ -224,12 +225,12 @@
             self.user.patchProfile(serializedPatch, function (profile) {
               self.profile = Slide.User.deserializeProfile(profile);
             });
-            self.popToMaster();
+            self.popActivePageToMaster();
           }
         });
 
         self.updateNavbar($detail, { title: category.description, back: true });
-        self.pushToDetail();
+        self.pushActivePageToDetail();
       });
     });
 
@@ -250,7 +251,7 @@
     $master.on('click', '.list-item', function () {
       var $detail = $relationships.find('.page.detail');
       self.updateNavbar($detail, { title: $(this).text(), back: true });
-      self.pushToDetail();
+      self.pushActivePageToDetail();
     });
 
     return $relationships;
@@ -262,10 +263,19 @@
     return $template;
   };
 
-  SlideMobile.prototype.updatePage = function (page, data) {
+  SlideMobile.prototype.replacePage = function (page, data) {
+    var $oldPage = this.pages[page];
     var $page = this.buildPage(page, data);
     this.pages[page].replaceWith($page);
     this.pages[page] = $page;
+
+    if ($oldPage.hasClass('active')) {
+      this.presentPage(page);
+    }
+
+    if ($oldPage.hasClass('pushed')) {
+      this.pushToDetail(page);
+    }
   }
 
   SlideMobile.prototype.presentPage = function (page) {
@@ -311,11 +321,19 @@
      });
    };
 
-  SlideMobile.prototype.pushToDetail = function () {
-    this.getActivePage().addClass('pushed');
+  SlideMobile.prototype.pushToDetail = function (page) {
+    this.pages[page].addClass('pushed');
   };
 
   SlideMobile.prototype.popToMaster = function () {
+    this.pages[page].removeClass('pushed');
+  };
+
+  SlideMobile.prototype.pushActivePageToDetail = function () {
+    this.getActivePage().addClass('pushed');
+  };
+
+  SlideMobile.prototype.popActivePageToMaster = function () {
     this.getActivePage().removeClass('pushed');
   };
 
