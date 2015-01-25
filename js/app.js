@@ -43,14 +43,21 @@
     this.pages = {};
 
     var self = this;
-    var number = '16144408217';
-    Slide.User.load(number, function (user) {
+    this.loginOrRegisterUser(function (user) {
       self.user = user;
 
       user.getProfile(function (profile) {
-        console.log('profile', profile);
-        // self.profile = Slide.User.deserializeProfile(profile);
-        self.getRequests(number, function (requests) {
+        console.log(profile);
+        var filteredProfile = {};
+        for( var k in profile ) {
+          if( k[0] != '_' ) {
+            filteredProfile[k] = profile[k];
+          }
+        }
+        console.log(filteredProfile);
+        self.profile = Slide.User.deserializeProfile(filteredProfile);
+
+        self.getRequests(self.user.number, function (requests) {
           self.requests = requests;
           // Notification Listeners
           self.bindPushNotificationListeners();
@@ -67,6 +74,13 @@
     });
   };
 
+  SlideMobile.prototype.loginOrRegisterUser = function (cb) {
+    var FALLBACK_NUMBER = '18572344988';
+    Slide.User.load(FALLBACK_NUMBER, function (user) {
+      cb(user);
+    });
+  };
+
   SlideMobile.prototype.bindPushNotificationListeners = function () {
     var self = this;
     this.user.listen(function (payload) {
@@ -74,8 +88,8 @@
       var vendorForm = payload.form;
 
       self.user.addRequest(vendorUUID);
+      self.requests.push({ form: vendorForm.name, fields: vendorForm.form_fields });
 
-      self.requests.push({ form: vendorForm.name, fields: vendorForm.fields });
       self.replacePage('requests', {
         requests: self.requests,
         title: 'Requests'
@@ -86,6 +100,8 @@
           { type: 'form', upstream: vendorForm.id },
           { type: 'vendor_user', downstream: vendorUser.uuid, key: vendorUser.public_key},
           function (conv) {
+            self.currentConversation = conv;
+            self.currentUUID = vendorUUID;
             conv.submit(vendorUser.uuid, {'slide/life:bank/card': 'hello'});
           });
       });
@@ -157,7 +173,6 @@
         vendorUsers.forEach(function (vendorUser) {
           var deferred = new $.Deferred();
           deferreds.push(deferred);
-          console.log('user', vendorUser);
           vendorUser.loadVendorForms(function (vendorForms) {
             self.forms[vendorUser.uuid] = vendorForms;
             self.currentVendorUser = vendorUser;
@@ -175,9 +190,9 @@
   SlideMobile.prototype.initializePages = function () {
     var self = this;
 
-    this.pages.requests = this.initializeRequestsPage();
-    this.pages.profile = this.initializeProfilePage();
-    this.pages.relationships = this.initializeRelationshipsPage();
+    this.pages.requests = this.buildPage('requests');
+    this.pages.profile = this.buildPage('profile');
+    this.pages.relationships = this.buildPage('relationships');
 
     $.each(this.pages, function (page, $html) {
       self.$container.append($html);
@@ -188,21 +203,28 @@
     });
   };
 
-  SlideMobile.prototype.initializeRequestsPage = function () {
+  SlideMobile.prototype.buildRequestsPage = function (page, data) {
     var self = this;
-    var $requests = this.buildPage('requests', {
+    var $requests = $(this.templates[page]({
       requests: this.requests,
       title: 'Requests'
-    });
+    }));
+    $requests.attr('data-page', page);
 
     var $master = $requests.find('.page.master');
     var $detail = $requests.find('.page.detail');
-    $requests.on('click', '.list-item', function () {
-      console.log('click');
+    $master.on('click', '.list-item', function () {
       var request = self.requests[$(this).data('target')];
       Slide.Form.createFromIdentifiers($detail.find('.body'), request.fields, function (form) {
         form.build(self.profile, {
           onSubmit: function () {
+            var data = form.getData();
+            var clean = {};
+            for( var k in data ) {
+              clean[k.replace(/\./g, '/')] = data[k];
+            }
+
+            self.currentConversation.submit(self.currentUUID, clean);
             self.popActivePageToMaster();
           }
         });
@@ -215,12 +237,13 @@
     return $requests;
   };
 
-  SlideMobile.prototype.initializeProfilePage = function () {
+  SlideMobile.prototype.buildProfilePage = function (page, data) {
     var self = this;
-    var $profile = this.buildPage('profile', {
+    var $profile = $(this.templates[page]({
       categories: this.categories,
       title: 'Profile'
-    });
+    }));
+    $profile.attr('data-page', page);
 
     var $master = $profile.find('.page.master');
     var $detail = $profile.find('.page.detail');
@@ -245,14 +268,12 @@
     return $profile;
   };
 
-  SlideMobile.prototype.initializeRelationshipsPage = function () {
+  SlideMobile.prototype.buildRelationshipsPage = function (page, data) {
     var self = this;
-    var $relationships = this.buildPage('relationships', {
-      title: 'Relationships',
-      detail: {
-        back: true
-      }
-    });
+    var $relationships = $(this.templates[page]({
+      title: 'Relationships'
+    }));
+    $relationships.attr('data-page', page);
 
     var $master = $relationships.find('.page.master');
     var $detail = $relationships.find('.page.detail');
@@ -266,9 +287,15 @@
   };
 
   SlideMobile.prototype.buildPage = function (page, data) {
-    var $template = $(this.templates[page](data));
-    $template.attr('data-page', page);
-    return $template;
+    if (page === 'requests') {
+      return this.buildRequestsPage(page, data);
+    } else if (page === 'profile') {
+      return this.buildProfilePage(page, data);
+    } else if (page === 'relationships') {
+      return this.buildRelationshipsPage(page, data);
+    } else {
+      throw new Error('Invalid page');
+    }
   };
 
   SlideMobile.prototype.replacePage = function (page, data) {
