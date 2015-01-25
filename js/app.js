@@ -1,15 +1,4 @@
 (function ($) {
-  var REQUESTS = [
-    {
-      form: 'The Coop Signup',
-      fields: ['name', 'address', 'bank.card']
-    },
-    {
-      form: 'Insomnia Cookies Loyalty',
-      fields: ['name', 'email', 'mobile-phone']
-    }
-  ];
-
   var CATEGORIES = {
     banking: {
       description: 'Banking',
@@ -37,13 +26,14 @@
     }
   };
 
-  var SlideMobile = function () {
+  var SlideMobile = function (cb) {
     var self = this;
 
     // Data
     this.categories = CATEGORIES;
     this.profile = {};
-    this.requests = REQUESTS;
+    this.requests = [];
+    this.user = {};
 
     // View logic
     this.$container = $('.container');
@@ -51,45 +41,59 @@
     this.templates = SlideMobileTemplates;
     this.pages = {};
 
-    // View initialization
-    this.initializePages();
-    this.initializeNavbarListeners();
-
     var self = this;
-    var number = '16144408217';
-    Slide.User.load(number, function(user) {
+    var number = '18572344988';
+    Slide.User.load(number, function (user) {
+      self.user = user;
+
       user.getProfile(function (profile) {
         self.profile = Slide.User.deserializeProfile(profile);
-      });
-      user.listen(function(payload) {
-        var vendorUUID = payload.vendorUser;
-        var vendorForm = payload.form;
-        new Slide.VendorUser(vendorUUID).load(function(vendorUser) {
-          var row = $('.list-item').eq(0).clone();
-          row.find('.title').text(payload.form.name);
-          row.prependTo('.list-view');
-          // TODO: open conversation with VendorForm
-           new Slide.Conversation(
-            {type: 'form', upstream: vendorForm.id },
-            {type: 'vendor_user', downstream: vendorUser.uuid, key: vendorUser.public_key},
-            function(conv) {
-              conv.submit(vendorUser.uuid, {'slide/life:bank/card': 'hello'});
-            });
+        self.getRequests(number, function(forms) {
+          self.forms = forms;
         });
       });
-    });
 
-    this.getFormList(number, function(forms) {
-      console.log('forms', forms);
+      // Notification Listeners
+      self.bindPushNotificationListeners();
+
+      // View initialization
+      self.initializePages();
+      self.initializeNavbarListeners();
+
+      // Initialization finished
+      cb();
     });
   };
 
-  SlideMobile.prototype.getFormList = function(number, cb) {
+  SlideMobile.prototype.bindPushNotificationListeners = function () {
     var self = this;
-    this.loadForms(number, function(forms) {
+    this.user.listen(function (payload) {
+      var vendorUUID = payload.vendorUser;
+      var vendorForm = payload.form;
+
+      self.requests.push({ form: vendorForm.name, fields: vendorForm.fields });
+      self.updatePage('requests', {
+        requests: this.requests,
+        title: 'Requests'
+      });
+
+      new Slide.VendorUser(vendorUUID).load(function(vendorUser) {
+         new Slide.Conversation(
+          { type: 'form', upstream: vendorForm.id },
+          { type: 'vendor_user', downstream: vendorUser.uuid, key: vendorUser.public_key},
+          function (conv) {
+            conv.submit(vendorUser.uuid, {'slide/life:bank/card': 'hello'});
+          });
+      });
+    });
+  }
+
+  SlideMobile.prototype.getRequests = function(number, cb) {
+    var self = this;
+    this.loadForms(number, function (forms) {
       self.requests = [];
-      for (vendorUserUuid in forms) {
-        vendorUserForms = forms[vendorUserUuid];
+      for (vendorUserUUID in forms) {
+        vendorUserForms = forms[vendorUserUUID];
         for (formName in vendorUserForms) {
           self.requests.push({
             form: formName,
@@ -187,8 +191,6 @@
     var $detail = $requests.find('.page.detail');
     $requests.on('click', '.list-item', function () {
       var request = self.requests[$(this).data('target')];
-      console.log(self.requests);
-      console.log($(this).data('target'));
       Slide.Form.createFromIdentifiers($detail.find('.body'), request.fields, function (form) {
         form.build(self.profile, {
           onSubmit: function () {
@@ -260,6 +262,12 @@
     return $template;
   };
 
+  SlideMobile.prototype.updatePage = function (page, data) {
+    var $page = this.buildPage(page, data);
+    this.pages[page].replaceWith($page);
+    this.pages[page] = $page;
+  }
+
   SlideMobile.prototype.presentPage = function (page) {
     this.$container.attr('data-page', page);
     this.$container.find('.content').removeClass('active');
@@ -303,7 +311,6 @@
      });
    };
 
-
   SlideMobile.prototype.pushToDetail = function () {
     this.getActivePage().addClass('pushed');
   };
@@ -312,6 +319,7 @@
     this.getActivePage().removeClass('pushed');
   };
 
-  var app = new SlideMobile();
-  app.presentPage(app.$tabBar.find('.tab.active').data('target'));
+  var app = new SlideMobile(function () {
+    app.presentPage(app.$tabBar.find('.tab.active').data('target'));
+  });
 })($);
