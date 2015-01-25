@@ -220,7 +220,7 @@
           onSubmit: function () {
             var serializedPatch = Slide.User.serializeProfile(form.getPatchedUserData());
             self.user.patchProfile(serializedPatch, function (profile) {
-              self.profile = profile;
+              self.profile = Slide.User.deserializeProfile(profile);
             });
             self.popToMaster();
           }
