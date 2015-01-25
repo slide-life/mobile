@@ -1,14 +1,14 @@
 (function ($) {
-  // var REQUESTS = [
-  //   {
-  //     form: 'The Coop Signup',
-  //     fields: ['name', 'address', 'bank.card']
-  //   },
-  //   {
-  //     form: 'Insomnia Cookies Loyalty',
-  //     fields: ['name', 'email', 'mobile-phone']
-  //   }
-  // ];
+  var REQUESTS = [
+    {
+      form: 'The Coop Signup',
+      fields: ['name', 'address', 'bank.card']
+    },
+    {
+      form: 'Insomnia Cookies Loyalty',
+      fields: ['name', 'email', 'mobile-phone']
+    }
+  ];
 
   var CATEGORIES = {
     banking: {
@@ -43,18 +43,51 @@
     // Data
     this.categories = CATEGORIES;
     this.profile = {};
-    this.initializeRequests(function () {
-      // View logic
-      self.$container = $('.container');
-      self.$tabBar = $('.tab-bar');
-      self.templates = SlideMobileTemplates;
-      self.pages = {};
+    this.requests = REQUESTS;
 
-      // View initialization
-      self.initializePages();
-      self.initializeNavbarListeners();
+    // View logic
+    this.$container = $('.container');
+    this.$tabBar = $('.tab-bar');
+    this.templates = SlideMobileTemplates;
+    this.pages = {};
+
+    // View initialization
+    this.initializePages();
+    this.initializeNavbarListeners();
+
+    var self = this;
+    var number = '16144408217';
+    Slide.User.load(number, function(user) {
+      console.log(user);
+      user.listen(function(form) {
+        var vendorForm = form;
+        var row = $('.list-item').eq(0).clone();
+        row.find('.title').text(form.name);
+        row.prependTo('.list-view');
+        // TODO: open conversation with VendorForm
+      });
     });
 
+    this.getFormList(number, function(forms) {
+      console.log('forms', forms);
+    });
+  };
+
+  SlideMobile.prototype.getFormList = function(number, cb) {
+    var self = this;
+    this.loadForms(number, function(forms) {
+      self.requests = [];
+      for (vendorUserUuid in forms) {
+        vendorUserForms = forms[vendorUserUuid];
+        for (formName in vendorUserForms) {
+          self.requests.push({
+            form: formName,
+            fields: vendorUserForms[formName].fields
+          });
+        }
+      }
+      cb(self.requests);
+    });
   };
 
   // SlideMobile.prototype.submit = function (fields, vendorUser, vendorForm, cb) {
@@ -68,14 +101,6 @@
   //     }
   //   );
   // };
-
-  SlideMobile.prototype.initializeRequests = function (cb) {
-    var self = this;
-    this.getRequests('12223334444', function (requests) { // TODO: rely on user.load/register
-      self.requests = requests;
-      cb();
-    });
-  };
 
   SlideMobile.prototype.loadUser = function (number, cb) {
     if (this.user) {
