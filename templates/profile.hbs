@@ -1,8 +1,17 @@
 <div class="content">
   <div class="master page">
-    <h1>Profile</h1>
+    {{> nav-bar this}}
+    <ul class="list-view">
+      {{#each categories}}
+        <li class="list-item" data-target={{@key}}>
+          <div class="title">{{description}}</div>
+          <div class="annotation"><span class="glyphicon glyphicon-menu-right"></span></div>
+        </li>
+      {{/each}}
+    </ul>
   </div>
   <div class="detail page">
-    <h1>Detail</h1>
+    {{> nav-bar detail}}
+    <div class="body"></div>
   </div>
 </div>
