@@ -899,6 +899,7 @@ button {
   height: 45px;
   line-height: 45px;
   padding: 0 12px;
+  position: relative;
   background-color: #E7E7E7; }
 
 .content .nav-bar {
@@ -906,8 +907,8 @@ button {
   text-align: center; }
 
 .content .nav-bar .back-button {
-  float: left;
   cursor: pointer;
+  position: absolute;
   color: #5298FC; }
 
 .content .nav-bar .back-button .glyphicon {

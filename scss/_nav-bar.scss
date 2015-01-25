@@ -4,6 +4,7 @@ $nav-bar-height: 45px;
   height: $nav-bar-height;
   line-height: $nav-bar-height;
   padding: 0 12px;
+  position: relative;
   background-color: #E7E7E7;
 }
 
@@ -13,8 +14,8 @@ $nav-bar-height: 45px;
 }
 
 .content .nav-bar .back-button {
-  float: left;
   cursor: pointer;
+  position: absolute;
   color: $bright-blue;
 }
 
