@@ -47,16 +47,13 @@
       self.user = user;
 
       user.getProfile(function (profile) {
-        console.log(profile);
         var filteredProfile = {};
         for( var k in profile ) {
           if( k[0] != '_' ) {
             filteredProfile[k] = profile[k];
           }
         }
-        console.log(filteredProfile);
         self.profile = Slide.User.deserializeProfile(filteredProfile);
-
         self.getRequests(self.user.number, function (requests) {
           self.requests = requests;
           // Notification Listeners
