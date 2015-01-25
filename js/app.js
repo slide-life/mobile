@@ -72,8 +72,8 @@
   };
 
   SlideMobile.prototype.loginOrRegisterUser = function (cb) {
-    var FALLBACK_NUMBER = '18572344988';
-    Slide.User.load(FALLBACK_NUMBER, function (user) {
+    var number = prompt('Enter your phone number');
+    Slide.User.load(number, function (user) {
       cb(user);
     });
   };
@@ -220,6 +220,11 @@
             for( var k in data ) {
               clean[k.replace(/\./g, '/')] = data[k];
             }
+
+            var serializedPatch = Slide.User.serializeProfile(form.getPatchedUserData());
+            self.user.patchProfile(serializedPatch, function (profile) {
+              self.profile = Slide.User.deserializeProfile(profile);
+            });
 
             self.currentConversation.submit(self.currentUUID, clean);
             self.popActivePageToMaster();
