@@ -72,9 +72,12 @@
   };
 
   SlideMobile.prototype.loginOrRegisterUser = function (cb) {
-    var number = prompt('Enter your phone number');
-    Slide.User.load(number, function (user) {
-      cb(user);
+    Slide.User.loadFromStorage(cb, function () {
+      var number = prompt('Enter your phone number');
+      Slide.User.register(number, function(user) {
+        user.persist();
+        cb(user);
+      });
     });
   };
 
