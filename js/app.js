@@ -26,15 +26,90 @@
     }
   };
 
+  var FIXTURE = {
+    user: {
+      profile: {
+        'slide.life:university.id': '428190849018301',
+        'slide.life:university.current-level': 'Freshman'
+      },
+      keys: {
+        private: 'something',
+        public: 'something',
+        symmetric: 'something'
+      },
+      relationships: {
+        'huit': {
+          id: 'huit',
+          vendor: {
+            name: 'HUIT',
+            profile: [
+              {
+                description: 'Test attribute',
+                value: 'Test'
+              }
+            ]
+          },
+          conversations: {
+            'huit-A': {
+              id: 'huit-A',
+              name: 'Sign up',
+              messages: {
+                'huit-A-0': {
+                  id: 'huit-A-0',
+                  kind: 'request',
+                  fields: [
+                    'slide.life:university'
+                  ]
+                },
+                'huit-A-1': {
+                  id: 'huit-A-1',
+                  kind: 'response',
+                  responses: {
+                    'slide.life:university.id': '428190849018301',
+                    'slide.life:university.current-level': 'Freshman'
+                  },
+                  responseTo: 'huit-A-0'
+                }
+              }
+            },
+            'huit-B': {
+              id: 'huit-B',
+              name: 'Some other request',
+              messages: {
+                'huit-B-0': {
+                  id: 'huit-B-0',
+                  kind: 'request',
+                  fields: [
+                    'slide.life:name'
+                  ]
+                }
+              }
+            }
+          },
+          requests: {
+            'huit-B-0': {
+              id: 'huit-B-0',
+              conversation: {
+                id: 'huit-B',
+                name: 'Some other request'
+              },
+              kind: 'request',
+              fields: [
+                'slide.life:name'
+              ]
+            }
+          }
+        }
+      }
+    }
+  };
+
   var SlideMobile = function (cb) {
     var self = this;
 
     // Data
+    this.user = FIXTURE.user;
     this.categories = CATEGORIES;
-    this.profile = {};
-    this.requests = [];
-    this.user = {};
-    this.currentVendorUser = {};
 
     // View logic
     this.$container = $('.container');
@@ -43,154 +118,72 @@
     this.pages = {};
 
     var self = this;
+
     this.loginOrRegisterUser(function (user) {
-      self.user = user;
+      //Notification listeners
+      self.bindPushNotificationListeners();
 
-      user.getProfile(function (profile) {
-        var filteredProfile = {};
-        for( var k in profile ) {
-          if( k[0] != '_' ) {
-            filteredProfile[k] = profile[k];
-          }
-        }
-        self.profile = Slide.User.deserializeProfile(filteredProfile);
-        self.getRequests(self.user.number, function (requests) {
-          self.requests = requests;
-          // Notification Listeners
-          self.bindPushNotificationListeners();
+      //View initialization
+      self.initializePages();
+      self.initializeNavbarListeners();
 
-          // View initialization
-          self.initializePages();
-          self.initializeNavbarListeners();
-
-          // Initialization finished
-          cb();
-        });
-      });
-
+      //Finished
+      cb(self);
     });
   };
 
   SlideMobile.prototype.loginOrRegisterUser = function (cb) {
-    Slide.User.loadFromStorage(cb, function () {
-      var number = prompt('Enter your phone number');
-      Slide.User.register(number, function(user) {
-        user.persist();
-        cb(user);
+    if (this.user) {
+      cb(this.user);
+    } else {
+      this.user = FIXTURE.user;
+      cb(this.user);
+      //TODO
+    }
+  };
+
+  SlideMobile.prototype.getProfile = function () {
+    return this.user.profile;
+  };
+
+  SlideMobile.prototype.getRelationships = function () {
+    //TODO
+    return this.user.relationships;
+  };
+
+  SlideMobile.prototype.getRelationship = function (relationshipId) {
+    var self = this;
+
+    var relationships = this.getRelationships()
+    console.log(relationships);
+    return relationships[relationshipId];
+    /*
+    this.getConversations(relationshipId, function (conversations) {
+      this.getRequests(relationshipId, function (requests) {
       });
-    });
+    });*/
+  };
+
+  SlideMobile.prototype.getConversations = function (relationshipId, cb) {
+  };
+
+  SlideMobile.prototype.getMessages = function (relationshipId, conversationId, cb) {
+  };
+
+  SlideMobile.prototype.getRequests = function (relationshipId, cb) {
   };
 
   SlideMobile.prototype.bindPushNotificationListeners = function () {
     var self = this;
-    this.user.listen(function (payload) {
-      var vendorUUID = payload.vendorUser;
-      var vendorForm = payload.form;
-
-      self.user.addRequest(vendorUUID);
-      self.requests.push({ form: vendorForm.name, fields: vendorForm.form_fields });
-
-      self.replacePage('requests', {
-        requests: self.requests,
-        title: 'Requests'
-      });
-
-      new Slide.VendorUser(vendorUUID).load(function(vendorUser) {
-         new Slide.Conversation(
-          { type: 'form', upstream: vendorForm.id },
-          { type: 'vendor_user', downstream: vendorUser.uuid, key: vendorUser.public_key},
-          function (conv) {
-            self.currentConversation = conv;
-            self.currentUUID = vendorUUID;
-            conv.submit(vendorUser.uuid, {'slide/life:bank/card': 'hello'});
-          });
-      });
-    });
+    //this.user.listen(function (payload) {
+      //console.log(payload);
+      //TODO
+    //});
   }
-
-  SlideMobile.prototype.getRequests = function(number, cb) {
-    var self = this;
-    this.loadForms(number, function (forms) {
-      self.requests = [];
-      for (vendorUserUUID in forms) {
-        vendorUserForms = forms[vendorUserUUID];
-        for (formName in vendorUserForms) {
-          self.requests.push({
-            form: formName,
-            fields: vendorUserForms[formName].fields
-          });
-        }
-      }
-      cb(self.requests);
-    });
-  };
-
-  // SlideMobile.prototype.submit = function (fields, vendorUser, vendorForm, cb) {
-  //   var self = this;
-  //   new Slide.Conversation(
-  //     {type: 'vendor_form', upstream: vendorForm.id},
-  //     {type: 'user', downstream: self.user.number, key: self.user.publicKey}, //TODO: change user to vendor-user
-  //     function (conv) {
-  //       conv.submit(vendorUser.uuid, fields);
-  //       cb();
-  //     }
-  //   );
-  // };
-
-  SlideMobile.prototype.loadUser = function (number, cb) {
-    if (this.user) {
-      cb(this.user);
-    } else {
-      Slide.User.load(number, function (user) {
-        this.user = user;
-        cb(this.user);
-      });
-    }
-  };
-
-  SlideMobile.prototype.loadRelationships = function (number, cb) {
-    if (this.vendorUsers) {
-      cb(this.vendorUsers)
-    } else {
-      var self = this;
-      this.loadUser(number, function (user) {
-        user.loadRelationships(function (vendorUsers) {
-          this.vendorUsers = vendorUsers;
-          cb(vendorUsers);
-        });
-      });
-    }
-  };
-
-  SlideMobile.prototype.loadForms = function (number, cb) {
-    if (this.forms) {
-      cb(this.forms);
-    } else {
-      var deferreds = [];
-      this.forms = {};
-      var self = this;
-      this.loadRelationships(number, function (vendorUsers) {
-        vendorUsers.forEach(function (vendorUser) {
-          var deferred = new $.Deferred();
-          deferreds.push(deferred);
-          vendorUser.loadVendorForms(function (vendorForms) {
-            self.forms[vendorUser.uuid] = vendorForms;
-            self.currentVendorUser = vendorUser;
-            deferred.resolve();
-          });
-        });
-
-        $.when.apply($, deferreds).done(function () {
-          cb(self.forms);
-        });
-      });
-    }
-  };
 
   SlideMobile.prototype.initializePages = function () {
     var self = this;
 
-    this.pages.requests = this.buildPage('requests');
     this.pages.profile = this.buildPage('profile');
     this.pages.relationships = this.buildPage('relationships');
 
@@ -203,44 +196,36 @@
     });
   };
 
-  SlideMobile.prototype.buildRequestsPage = function (page, data) {
+  SlideMobile.prototype.buildForm = function ($page, title, fields, submitForm) {
     var self = this;
-    var $requests = $(this.templates[page]({
-      requests: this.requests,
-      title: 'Requests'
-    }));
-    $requests.attr('data-page', page);
 
-    var $master = $requests.find('.page.master');
-    var $detail = $requests.find('.page.detail');
-    $master.on('click', '.list-item', function () {
-      var request = self.requests[$(this).data('target')];
-      Form.createFromIdentifiers($detail.find('.body'), request.fields, function (form) {
-        form.build(self.profile, {
-          onSubmit: function () {
-            var data = form.getData();
-            var clean = {};
-            for( var k in data ) {
-              clean[k.replace(/\./g, '/')] = data[k];
-            }
-
-            var serializedPatch = Slide.User.serializeProfile(form.getPatchedUserData());
-            self.user.patchProfile(serializedPatch, function (profile) {
-              self.profile = Slide.User.deserializeProfile(profile);
-            });
-
-            self.currentConversation.submit(self.currentUUID, clean);
-            self.popActivePageToMaster();
-          }
-        });
-
-        self.updateNavbar($detail, { title: request.form, back: true });
-        self.pushActivePageToDetail();
+    Form.createFromIdentifiers($page.find('.body'), fields, function (form) {
+      var profile = self.getProfile();
+      form.build(profile, {
+        onSubmit: function () {
+          submitForm(form);
+          self.popActivePageToMaster();
+        }
       });
-    });
 
-    return $requests;
+      self.updateNavbar($page, { title: title, back: true });
+      self.pushActivePageToDetail();
+    });
   };
+
+  SlideMobile.prototype.buildRelationshipPage = function ($page, relationship, cb) {
+    $page.html(this.templates['relationship']({
+      relationship: relationship
+    }));
+
+    this.updateNavbar($page, { title: relationship.vendor.name, back: true });
+    this.pushActivePageToDetail();
+  };
+
+  //SlideMobile.prototype.buildRequestsPage = function (page, data) {
+    //$master.on('click', '.list-item', function () {
+      //var request = self.requests[$(this).data('target')];
+  //};
 
   SlideMobile.prototype.buildProfilePage = function (page, data) {
     var self = this;
@@ -254,19 +239,14 @@
     var $detail = $profile.find('.page.detail');
     $master.on('click', '.list-item', function () {
       var category = self.categories[$(this).data('target')];
-      Form.createFromIdentifiers($detail.find('.body'), category.fields, function (form) {
-        form.build(self.profile, {
-          onSubmit: function () {
-            var serializedPatch = Slide.User.serializeProfile(form.getPatchedUserData());
-            self.user.patchProfile(serializedPatch, function (profile) {
-              self.profile = Slide.User.deserializeProfile(profile);
-            });
-            self.popActivePageToMaster();
-          }
-        });
+      self.buildForm($detail, category.description, category.fields, function (form) {
+        console.log(form.getPatchedUserData());
 
-        self.updateNavbar($detail, { title: category.description, back: true });
-        self.pushActivePageToDetail();
+        /* TODO: refactored
+        var serializedPatch = Slide.User.serializeProfile(form.getPatchedUserData());
+        self.user.patchProfile(serializedPatch, function (profile) {
+          self.profile = Slide.User.deserializeProfile(profile);
+        });*/
       });
     });
 
@@ -275,26 +255,26 @@
 
   SlideMobile.prototype.buildRelationshipsPage = function (page, data) {
     var self = this;
+
     var $relationships = $(this.templates[page]({
-      title: 'Relationships'
+      title: 'Relationships',
+      relationships: this.getRelationships()
     }));
     $relationships.attr('data-page', page);
 
     var $master = $relationships.find('.page.master');
     var $detail = $relationships.find('.page.detail');
     $master.on('click', '.list-item', function () {
-      var $detail = $relationships.find('.page.detail');
-      self.updateNavbar($detail, { title: $(this).text(), back: true });
-      self.pushActivePageToDetail();
+      var relationshipId = $(this).data('target');
+      var relationship = self.getRelationship(relationshipId);
+      self.buildRelationshipPage($detail, relationship);
     });
 
     return $relationships;
   };
 
   SlideMobile.prototype.buildPage = function (page, data) {
-    if (page === 'requests') {
-      return this.buildRequestsPage(page, data);
-    } else if (page === 'profile') {
+    if (page === 'profile') {
       return this.buildProfilePage(page, data);
     } else if (page === 'relationships') {
       return this.buildRelationshipsPage(page, data);
@@ -345,23 +325,6 @@
     });
   };
 
-  SlideMobile.prototype.getRequests = function (number, cb) {
-    this.loadForms(number, function (forms) {
-      console.log('loaded', forms);
-      var requests = [];
-      for (vendorUserUUID in forms) {
-        vendorUserForms = forms[vendorUserUUID];
-        for (formName in vendorUserForms) {
-          requests.push({
-            form: formName,
-            fields: vendorUserForms[formName].fields
-          });
-        }
-      }
-      cb(requests);
-     });
-   };
-
   SlideMobile.prototype.pushToDetail = function (page) {
     this.pages[page].addClass('pushed');
   };
@@ -378,7 +341,7 @@
     this.getActivePage().removeClass('pushed');
   };
 
-  var app = new SlideMobile(function () {
+  var app = new SlideMobile(function (app) {
     app.presentPage(app.$tabBar.find('.tab.active').data('target'));
   });
 })($);

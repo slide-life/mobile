@@ -1,0 +1,31 @@
+{{> nav-bar this}}
+
+<h5 class="relationships-title">Pending requests</h5>
+<ul class="list-view">
+  {{#each relationship.requests}}
+  <li class="list-item" data-target="{{id}}">
+    <div class="title">{{conversation.name}}</div>
+    <div class="annotation">{{createdAt}}</div>
+  </li>
+  {{/each}}
+</ul>
+
+<h5 class="relationships-title">Organization profile</h5>
+<ul class="list-view">
+  {{#each relationship.vendor.profile}}
+  <li class="list-item">
+    <div class="title">{{description}}</div>
+    <div class="annotation">{{value}}</div>
+  </li>
+  {{/each}}
+</ul>
+
+<h5 class="relationships-title">Relationship history</h5>
+<ul class="list-view">
+  {{#each relationship.conversations}}
+  <li class="list-item">
+    <div class="title">{{name}}</div>
+    <div class="annotation">{{updatedAt}}</div>
+  </li>
+  {{/each}}
+</ul>
