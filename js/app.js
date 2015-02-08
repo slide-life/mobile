@@ -215,7 +215,7 @@
     var $detail = $requests.find('.page.detail');
     $master.on('click', '.list-item', function () {
       var request = self.requests[$(this).data('target')];
-      Slide.Form.createFromIdentifiers($detail.find('.body'), request.fields, function (form) {
+      Form.createFromIdentifiers($detail.find('.body'), request.fields, function (form) {
         form.build(self.profile, {
           onSubmit: function () {
             var data = form.getData();
@@ -254,7 +254,7 @@
     var $detail = $profile.find('.page.detail');
     $master.on('click', '.list-item', function () {
       var category = self.categories[$(this).data('target')];
-      Slide.Form.createFromIdentifiers($detail.find('.body'), category.fields, function (form) {
+      Form.createFromIdentifiers($detail.find('.body'), category.fields, function (form) {
         form.build(self.profile, {
           onSubmit: function () {
             var serializedPatch = Slide.User.serializeProfile(form.getPatchedUserData());
