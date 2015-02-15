@@ -953,7 +953,7 @@ button {
   z-index: 3; }
 
 .tab {
-  width: 33.33%;
+  width: 50%;
   cursor: pointer;
   float: left;
   text-align: center;

@@ -120,6 +120,7 @@
     var self = this;
 
     this.loginOrRegisterUser(function (user) {
+      self.user = user;
       //Notification listeners
       self.bindPushNotificationListeners();
 
@@ -133,12 +134,16 @@
   };
 
   SlideMobile.prototype.loginOrRegisterUser = function (cb) {
+    // TODO: read from localStorage
     if (this.user) {
       cb(this.user);
     } else {
       this.user = FIXTURE.user;
-      cb(this.user);
-      //TODO
+      Slide.User.create({ value: prompt('Enter a phone number.'), type: 'phone' },
+        prompt('Enter a password.'), {
+          success: cb,
+          failure: function() { console.log('failed'); }
+        });
     }
   };
 

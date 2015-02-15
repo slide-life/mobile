@@ -124,7 +124,7 @@ Form.CARDS = ['slide.life:bank.card', 'slide.life:bank.account', 'slide.life:nam
               'slide.life:address'];
 
 Form.createFromIdentifiers = function ($container, identifiers, cb) {
-  Slide.Block.getFieldsForIdentifiers(identifiers, function (fields) {
+  Slide.Card.getSchemasForFields(identifiers, function (fields) {
     var form = new Form($container, fields);
     cb(form);
   });
@@ -191,7 +191,7 @@ Form.prototype._isCard = function (identifier) {
 };
 
 Form.prototype._getDataForIdentifier = function (identifier) {
-  var path = Slide.Block.getPathForIdentifier(identifier);
+  var path = Slide.Card.getPathForField(identifier);
   return this.userData[path.identifier] || [];
 };
 
@@ -317,7 +317,7 @@ Form.prototype.createCardHeader = function (identifier, field, card) {
 };
 
 Form.prototype.createCardSubfields = function (identifier, field, card) {
-  var fields = Slide.Block.flattenField(identifier, field);
+  var fields = Slide.Card.flattenField(identifier, field);
   var compound = [], self = this;
 
   $.each(fields, function (i, f) {
@@ -329,7 +329,7 @@ Form.prototype.createCardSubfields = function (identifier, field, card) {
 };
 
 Form.prototype.createCompound = function (identifier, field) {
-  var fields = Slide.Block.flattenField(identifier, field);
+  var fields = Slide.Card.flattenField(identifier, field);
   var compound = [], self = this;
 
   $.each(fields, function (i, f) {

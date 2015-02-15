@@ -1,5 +1,3 @@
-this["SlideMobileTemplates"] = this["SlideMobileTemplates"] || {};
-
 Handlebars.registerPartial("nav-bar", Handlebars.template({"1":function(depth0,helpers,partials,data) {
   return "    <div class=\"back-button\"><span class=\"glyphicon glyphicon-menu-left\"></span> Back</div>\n";
   },"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
@@ -10,6 +8,8 @@ Handlebars.registerPartial("nav-bar", Handlebars.template({"1":function(depth0,h
     + escapeExpression(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"title","hash":{},"data":data}) : helper)))
     + "</span>\n</div>\n";
 },"useData":true}));
+
+this["SlideMobileTemplates"] = this["SlideMobileTemplates"] || {};
 
 this["SlideMobileTemplates"]["profile"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
   var helper, lambda=this.lambda, escapeExpression=this.escapeExpression, functionType="function", helperMissing=helpers.helperMissing;
@@ -30,6 +30,8 @@ this["SlideMobileTemplates"]["profile"] = Handlebars.template({"1":function(dept
   if (stack1 != null) { buffer += stack1; }
   return buffer + "    <div class=\"body\"></div>\n  </div>\n</div>\n";
 },"usePartial":true,"useData":true});
+
+
 
 this["SlideMobileTemplates"]["relationship"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
   var stack1, helper, functionType="function", helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression, lambda=this.lambda;
@@ -70,6 +72,8 @@ this["SlideMobileTemplates"]["relationship"] = Handlebars.template({"1":function
   return buffer + "</ul>\n";
 },"usePartial":true,"useData":true});
 
+
+
 this["SlideMobileTemplates"]["relationships"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
   var stack1, helper, functionType="function", helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression, lambda=this.lambda;
   return "      <li class=\"list-item\" data-target=\""
@@ -86,6 +90,8 @@ this["SlideMobileTemplates"]["relationships"] = Handlebars.template({"1":functio
   if (stack1 != null) { buffer += stack1; }
   return buffer + "    </ul>\n  </div>\n\n  <div class=\"detail page\">\n  </div>\n</div>\n";
 },"usePartial":true,"useData":true});
+
+
 
 this["SlideMobileTemplates"]["requests"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
   var helper, lambda=this.lambda, escapeExpression=this.escapeExpression, functionType="function", helperMissing=helpers.helperMissing;
