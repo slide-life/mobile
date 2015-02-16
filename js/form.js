@@ -418,7 +418,7 @@ Form.prototype.getPatchedUserData = function () {
 
   $.each(updated, function (identifier, key) {
     if (!deepCompare(profile[identifier], updated[identifier])) {
-      patch[identifier] = updated[identifier];
+      patch[Slide.Card.normalizeField(identifier)] = updated[identifier];
     }
   });
 

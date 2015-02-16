@@ -108,7 +108,6 @@
     var self = this;
 
     // Data
-    this.user = FIXTURE.user;
     this.categories = CATEGORIES;
 
     // View logic
@@ -134,16 +133,28 @@
   };
 
   SlideMobile.prototype.loginOrRegisterUser = function (cb) {
-    // TODO: read from localStorage
-    if (this.user) {
-      cb(this.user);
-    } else {
-      this.user = FIXTURE.user;
+    var self = this;
+    this.loadUser(function(next) {
       Slide.User.create({ value: prompt('Enter a phone number.'), type: 'phone' },
         prompt('Enter a password.'), {
-          success: cb,
+          success: function(user) {
+            self.persistUser(user);
+            next(user);
+          },
           failure: function() { console.log('failed'); }
         });
+    }, cb);
+  };
+
+  SlideMobile.prototype.persistUser = function(user) {
+    localStorage.user = JSON.stringify(Slide.User.toObject(user));
+  };
+
+  SlideMobile.prototype.loadUser = function(middleware, cb) {
+    if (localStorage.user) {
+      cb(Slide.User.fromObject(JSON.parse(localStorage.user)));
+    } else {
+      middleware(cb);
     }
   };
 
@@ -244,14 +255,15 @@
     var $detail = $profile.find('.page.detail');
     $master.on('click', '.list-item', function () {
       var category = self.categories[$(this).data('target')];
+      // TODO: form needs to be populated with profile data.
       self.buildForm($detail, category.description, category.fields, function (form) {
-        console.log(form.getPatchedUserData());
-
-        /* TODO: refactored
-        var serializedPatch = Slide.User.serializeProfile(form.getPatchedUserData());
-        self.user.patchProfile(serializedPatch, function (profile) {
-          self.profile = Slide.User.deserializeProfile(profile);
-        });*/
+        var data = { private: form.getPatchedUserData() };
+        self.user.patch(data, {
+          success: function (user) {
+            self.profile = user.profile;
+          },
+          failure: function(fail) {
+          } });
       });
     });
 
