@@ -162,17 +162,30 @@
     return this.user.profile;
   };
 
-  SlideMobile.prototype.getRelationships = function () {
-    //TODO
-    return this.user.relationships;
+  SlideMobile.prototype.getRelationships = function (cb) {
+    console.log('id', this.user.id);
+    var self = this;
+    this.user.getRelationships({
+      success: function(rs) {
+        var store = {};
+        rs.forEach(function (r) {
+          Slide.Relationship.inlineReferences(r, function (r) {
+            store[r.id] = r;
+            if (Object.keys(store).length == rs.length) {
+              cb(store);
+            }
+          });
+        });
+      },
+      failure: function() {
+      } });
   };
 
-  SlideMobile.prototype.getRelationship = function (relationshipId) {
+  SlideMobile.prototype.getRelationship = function (relationshipId, cb) {
     var self = this;
-
-    var relationships = this.getRelationships()
-    console.log(relationships);
-    return relationships[relationshipId];
+    this.getRelationships(function (relationships) {
+      cb(relationships[relationshipId]);
+    });
     /*
     this.getConversations(relationshipId, function (conversations) {
       this.getRequests(relationshipId, function (requests) {
@@ -191,25 +204,30 @@
 
   SlideMobile.prototype.bindPushNotificationListeners = function () {
     var self = this;
-    //this.user.listen(function (payload) {
-      //console.log(payload);
-      //TODO
-    //});
+    this.user.listen(function (message, socket) {
+      console.log('requesting', message.blocks);
+      // TODO: mkdir -p relationship/conversation/request and reload view data
+    });
   }
 
   SlideMobile.prototype.initializePages = function () {
     var self = this;
+    this.buildPage('profile', {}, function(profile) {
+    self.buildPage('relationships', {}, function(relationships) {
 
-    this.pages.profile = this.buildPage('profile');
-    this.pages.relationships = this.buildPage('relationships');
+      self.pages.profile = profile;
+      self.pages.relationships = relationships;
+      $.each(self.pages, function (page, $html) {
+        self.$container.append($html);
+      });
 
-    $.each(this.pages, function (page, $html) {
-      self.$container.append($html);
+      self.$container.on('click', '.nav-bar .back-button', function () {
+        self.popActivePageToMaster();
+      });
+
+    });
     });
 
-    this.$container.on('click', '.nav-bar .back-button', function () {
-      self.popActivePageToMaster();
-    });
   };
 
   SlideMobile.prototype.buildForm = function ($page, title, fields, submitForm) {
@@ -234,16 +252,11 @@
       relationship: relationship
     }));
 
-    this.updateNavbar($page, { title: relationship.vendor.name, back: true });
+    this.updateNavbar($page, { title: relationship.left.name, back: true });
     this.pushActivePageToDetail();
   };
 
-  //SlideMobile.prototype.buildRequestsPage = function (page, data) {
-    //$master.on('click', '.list-item', function () {
-      //var request = self.requests[$(this).data('target')];
-  //};
-
-  SlideMobile.prototype.buildProfilePage = function (page, data) {
+  SlideMobile.prototype.buildProfilePage = function (page, data, cb) {
     var self = this;
     var $profile = $(this.templates[page]({
       categories: this.categories,
@@ -267,36 +280,39 @@
       });
     });
 
-    return $profile;
+    cb($profile);
   };
 
-  SlideMobile.prototype.buildRelationshipsPage = function (page, data) {
+  SlideMobile.prototype.buildRelationshipsPage = function (page, data, cb) {
     var self = this;
 
-    var $relationships = $(this.templates[page]({
-      title: 'Relationships',
-      relationships: this.getRelationships()
-    }));
-    $relationships.attr('data-page', page);
+    this.getRelationships(function (relationships) {
+      var $relationships = $(self.templates[page]({
+        title: 'Relationships',
+        relationships: relationships
+      }));
+      $relationships.attr('data-page', page);
 
-    var $master = $relationships.find('.page.master');
-    var $detail = $relationships.find('.page.detail');
-    $master.on('click', '.list-item', function () {
-      var relationshipId = $(this).data('target');
-      var relationship = self.getRelationship(relationshipId);
-      self.buildRelationshipPage($detail, relationship);
+      var $master = $relationships.find('.page.master');
+      var $detail = $relationships.find('.page.detail');
+      $master.on('click', '.list-item', function () {
+        var relationshipId = $(this).data('target');
+        self.getRelationship(relationshipId, function (relationship) {
+          self.buildRelationshipPage($detail, relationship);
+        });
+      });
+
+      cb($relationships);
     });
-
-    return $relationships;
   };
 
-  SlideMobile.prototype.buildPage = function (page, data) {
+  SlideMobile.prototype.buildPage = function (page, data, cb) {
     if (page === 'profile') {
-      return this.buildProfilePage(page, data);
+      this.buildProfilePage(page, data, cb);
     } else if (page === 'relationships') {
-      return this.buildRelationshipsPage(page, data);
+      this.buildRelationshipsPage(page, data, cb);
     } else {
-      throw new Error('Invalid page');
+      new Error('Invalid page');
     }
   };
 
