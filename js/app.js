@@ -283,14 +283,14 @@
     var $detail = $page.parents('.content').find('.page.detail');
     var $detail2 = $page.parents('.content').find('.page.detail2');
     $page.on('click', '.list-item', function () {
-      self.buildForm($detail2, relationship.name, ['slide.life:bank.card'], function (form) {
-        var data = { private: form.getPatchedUserData() };
-        self.user.patch(data, {
-          success: function (user) {
-            self.profile = user.profile;
-          },
-          failure: function(fail) {
-          } });
+      var id = $(this).data('target');
+      var request = relationship.requests.filter(function(r) {
+        return r.id == id;
+      })[0];
+      self.buildForm($detail2, relationship.name, request.blocks, function (form) {
+        var data = form.getUserData();
+        console.log('submitting', data);
+        // TODO: better structure this data
       });
     });
 
