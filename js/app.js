@@ -233,7 +233,8 @@
     var self = this;
     this.user.listen(function (message, socket) {
       console.log('requesting', message.blocks);
-      // TODO: mkdir -p relationship/conversation/request and reload view data
+      self.switchToTab(1);
+      self.replacePage('relationships');
     });
   }
 
@@ -360,17 +361,19 @@
 
   SlideMobile.prototype.replacePage = function (page, data) {
     var $oldPage = this.pages[page];
-    var $page = this.buildPage(page, data);
-    this.pages[page].replaceWith($page);
-    this.pages[page] = $page;
+    var self = this;
+    this.buildPage(page, data, function($page) {
+      self.pages[page].replaceWith($page);
+      self.pages[page] = $page;
 
-    if ($oldPage.hasClass('active')) {
-      this.presentPage(page);
-    }
+      if ($oldPage.hasClass('active')) {
+        self.presentPage(page);
+      }
 
-    if ($oldPage.hasClass('pushed')) {
-      this.pushToDetail(page);
-    }
+      if ($oldPage.hasClass('pushed')) {
+        self.pushToDetail(page);
+      }
+    });
   }
 
   SlideMobile.prototype.presentPage = function (page) {
@@ -392,11 +395,17 @@
     return this.$container.find('.content.active');
   };
 
+  SlideMobile.prototype.switchToTab = function (index) {
+    var tabs = this.$tabBar.find('.tab');
+    var tab = tabs.eq(index);
+    tab.addClass('active').siblings().removeClass('active');
+    this.presentPage(tab.data('target'));
+  };
   SlideMobile.prototype.initializeNavbarListeners = function () {
     var self = this;
     this.$tabBar.find('.tab').on('click', function () {
-      $(this).addClass('active').siblings().removeClass('active');
-      self.presentPage($(this).data('target'));
+      var index = $(this).index();
+      self.switchToTab(index);
     });
   };
 
