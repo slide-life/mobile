@@ -172,6 +172,7 @@
         }
         rs.forEach(function (r) {
           Slide.Relationship.inlineReferences(r, function (r) {
+            r.vendor = r.left;
             store[r.id] = r;
             if (Object.keys(store).length == rs.length) {
               cb(store);
@@ -188,22 +189,44 @@
     var self = this;
     this.getRelationships(function (relationships) {
       self.getConversations(relationshipId, function (conversations) {
-        self.getRequests(relationshipId, function (requests) {
-          cb(relationships[relationshipId]);
+        self.getMessages(conversations, Object.keys(conversations)[0], function (requests) {
+          var relationship = relationships[relationshipId];
+          relationship.conversations = conversations;
+          relationship.requests = requests;
+          cb(relationship);
         });
       });
     });
   };
 
   SlideMobile.prototype.getConversations = function (relationshipId, cb) {
-    // TODO
+    this.getRelationships(function (relationships) {
+      var relationship = relationships[relationshipId];
+      relationship.getConversations({
+        success: cb,
+        failure: function() {
+          cb([]);
+        }});
+    });
   };
 
-  SlideMobile.prototype.getMessages = function (relationshipId, conversationId, cb) {
+  SlideMobile.prototype.getMessages = function (conversations, conversationId, cb) {
+    var conversation = conversations[conversationId];
+    conversation.getMessages({
+      success: function(ms) {
+        cb(ms.map(function(m) {
+          m.conversation = conversation;
+          return m;
+        }));
+      },
+      failure: function() {
+        cb([]);
+      }});
   };
 
   SlideMobile.prototype.getRequests = function (relationshipId, cb) {
     // TODO
+    cb(FIXTURE.user.relationships.huit.requests);
   };
 
   SlideMobile.prototype.bindPushNotificationListeners = function () {
@@ -255,6 +278,11 @@
     $page.html(this.templates['relationship']({
       relationship: relationship
     }));
+
+    var $detail = $page.find('.page.detail');
+    $page.on('click', '.list-item', function () {
+      console.log('take action', $page);
+    });
 
     this.updateNavbar($page, { title: relationship.left.name, back: true });
     this.pushActivePageToDetail();
