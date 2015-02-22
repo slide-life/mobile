@@ -80,7 +80,9 @@ this["SlideMobileTemplates"]["relationships"] = Handlebars.template({"1":functio
     + escapeExpression(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"id","hash":{},"data":data}) : helper)))
     + "\">\n          <div class=\"title\">"
     + escapeExpression(lambda(((stack1 = (depth0 != null ? depth0.vendor : depth0)) != null ? stack1.name : stack1), depth0))
-    + "</div>\n          <div class=\"annotation\"><span class=\"glyphicon glyphicon-menu-right\"></span></div>\n        </li>\n";
+    + "</div>\n          <div class=\"annotation\">\n            <span class=\"badge\">"
+    + escapeExpression(lambda(((stack1 = (depth0 != null ? depth0.requests : depth0)) != null ? stack1.length : stack1), depth0))
+    + "</span>\n            <span class=\"glyphicon glyphicon-menu-right\"></span>\n          </div>\n      </li>\n";
 },"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
   var stack1, buffer = "<div class=\"content\">\n  <div class=\"master page\">\n";
   stack1 = this.invokePartial(partials['nav-bar'], '    ', 'nav-bar', depth0, undefined, helpers, partials, data);

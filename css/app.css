@@ -21,6 +21,13 @@
 .list-view .list-item .annotation {
   float: right; }
 
+.list-view .list-item .annotation .badge {
+  margin-right: 10px;
+  padding: 4px 7px;
+  background: #777;
+  color: white;
+  border-radius: 10px; }
+
 html, body {
   margin: 0;
   padding: 0;
@@ -950,6 +957,13 @@ button {
 
 .list-view .list-item .annotation {
   float: right; }
+
+.list-view .list-item .annotation .badge {
+  margin-right: 10px;
+  padding: 4px 7px;
+  background: #777;
+  color: white;
+  border-radius: 10px; }
 
 .tab-bar {
   position: fixed;

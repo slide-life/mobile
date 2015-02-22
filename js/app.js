@@ -171,12 +171,16 @@
           cb(store);
         }
         rs.forEach(function (r) {
-          Slide.Relationship.inlineReferences(r, function (r) {
-            r.vendor = r.left;
-            store[r.id] = r;
-            if (Object.keys(store).length == rs.length) {
-              cb(store);
-            }
+          self.loadConversations(r, function (cs) {
+            self.getRequests(cs, function (rqs) {
+              Slide.Relationship.inlineReferences(r, cs, rqs, function (r) {
+                r.vendor = r.left;
+                store[r.id] = r;
+                if (Object.keys(store).length == rs.length) {
+                  cb(store);
+                }
+              });
+            });
           });
         });
       },
@@ -188,26 +192,27 @@
   SlideMobile.prototype.getRelationship = function (relationshipId, cb) {
     var self = this;
     this.getRelationships(function (relationships) {
-      self.getConversations(relationshipId, function (conversations) {
-        self.getRequests(conversations, function (requests) {
-          var relationship = relationships[relationshipId];
-          relationship.conversations = conversations;
-          relationship.requests = requests;
-          relationship.user = self.user;
-          cb(relationship);
-        });
+      var relationship = relationships[relationshipId];
+      relationship.requests = relationship.requests.filter(function (r) {
+        return !r.read;
       });
+      relationship.user = self.user;
+      cb(relationship);
     });
   };
 
+  SlideMobile.prototype.loadConversations = function (relationship, cb) {
+    relationship.getConversations({
+      success: cb,
+      failure: function() {
+        cb([]);
+      }});
+  };
+
   SlideMobile.prototype.getConversations = function (relationshipId, cb) {
+    var self = this;
     this.getRelationships(function (relationships) {
-      var relationship = relationships[relationshipId];
-      relationship.getConversations({
-        success: cb,
-        failure: function() {
-          cb([]);
-        }});
+      self.loadConversations(relationships[relationshipId], cb);
     });
   };
 

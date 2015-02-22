@@ -5,8 +5,11 @@
       {{#each relationships}}
       <li class="list-item" data-target="{{id}}">
           <div class="title">{{vendor.name}}</div>
-          <div class="annotation"><span class="glyphicon glyphicon-menu-right"></span></div>
-        </li>
+          <div class="annotation">
+            <span class="badge">{{requests.length}}</span>
+            <span class="glyphicon glyphicon-menu-right"></span>
+          </div>
+      </li>
       {{/each}}
     </ul>
   </div>
