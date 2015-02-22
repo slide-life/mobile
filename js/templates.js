@@ -88,7 +88,10 @@ this["SlideMobileTemplates"]["relationships"] = Handlebars.template({"1":functio
   buffer += "    <ul class=\"list-view\">\n";
   stack1 = helpers.each.call(depth0, (depth0 != null ? depth0.relationships : depth0), {"name":"each","hash":{},"fn":this.program(1, data),"inverse":this.noop,"data":data});
   if (stack1 != null) { buffer += stack1; }
-  return buffer + "    </ul>\n  </div>\n\n  <div class=\"detail page\">\n  </div>\n</div>\n";
+  buffer += "    </ul>\n  </div>\n\n  <div class=\"detail page\">\n  </div>\n\n  <div class=\"detail2 page\">\n";
+  stack1 = this.invokePartial(partials['nav-bar'], '    ', 'nav-bar', (depth0 != null ? depth0.detail : depth0), undefined, helpers, partials, data);
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "    <div class=\"body\"></div>\n  </div>\n</div>\n";
 },"usePartial":true,"useData":true});
 
 

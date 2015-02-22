@@ -47,7 +47,7 @@ button {
   z-index: 1;
 }
 
-.page.detail {
+.page.detail, .page.detail2 {
   position: absolute;
   top: 0;
   left: 104%;
@@ -56,8 +56,18 @@ button {
   transition: left 0.6s ease;
 }
 
-.content.pushed .detail {
+.content.pushed .detail, .content.pushed2 .detail {
   left: 0;
+}
+
+.page.detail2 {
+  left: 208%;
+}
+.content.pushed .detail2 {
+  left: 104%;
+}
+.content.pushed2 .detail2 {
+  left: 0%;
 }
 
 .container .content {

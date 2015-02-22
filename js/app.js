@@ -275,13 +275,23 @@
   };
 
   SlideMobile.prototype.buildRelationshipPage = function ($page, relationship, cb) {
+    var self = this;
     $page.html(this.templates['relationship']({
       relationship: relationship
     }));
 
-    var $detail = $page.find('.page.detail');
+    var $detail = $page.parents('.content').find('.page.detail');
+    var $detail2 = $page.parents('.content').find('.page.detail2');
     $page.on('click', '.list-item', function () {
-      console.log('take action', $page);
+      self.buildForm($detail2, relationship.name, ['slide.life:bank.card'], function (form) {
+        var data = { private: form.getPatchedUserData() };
+        self.user.patch(data, {
+          success: function (user) {
+            self.profile = user.profile;
+          },
+          failure: function(fail) {
+          } });
+      });
     });
 
     this.updateNavbar($page, { title: relationship.left.name, back: true });
@@ -390,20 +400,32 @@
     });
   };
 
-  SlideMobile.prototype.pushToDetail = function (page) {
-    this.pages[page].addClass('pushed');
+  SlideMobile.prototype.pushToDetail = function (page, found) {
+    page = found ? page : this.pages[page];
+    if (page.is('.pushed')) {
+      page.removeClass('pushed');
+      page.addClass('pushed2');
+    } else {
+      page.addClass('pushed');
+    }
   };
 
-  SlideMobile.prototype.popToMaster = function () {
-    this.pages[page].removeClass('pushed');
+  SlideMobile.prototype.popToMaster = function (page, found) {
+    page = found ? page : this.pages[page];
+    if (page.is('.pushed2')) {
+      page.removeClass('pushed2');
+      page.addClass('pushed');
+    } else {
+      page.removeClass('pushed');
+    }
   };
 
   SlideMobile.prototype.pushActivePageToDetail = function () {
-    this.getActivePage().addClass('pushed');
+    this.pushToDetail(this.getActivePage(), true);
   };
 
   SlideMobile.prototype.popActivePageToMaster = function () {
-    this.getActivePage().removeClass('pushed');
+    this.popToMaster(this.getActivePage(), true);
   };
 
   var app = new SlideMobile(function (app) {
