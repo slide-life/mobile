@@ -411,6 +411,46 @@ Form.prototype.getUserData = function () {
   return $.extend(cardData, compoundData);
 };
 
+function flatten (a, obj) {
+  Object.keys(obj).forEach(function(k) {
+    var v = obj[k];
+    if (typeof v == 'object' && !Array.isArray(v)) {
+      flatten(a, v);
+    } else if (Array.isArray(v)) {
+      a[k] = v.map(function (card) {
+        var c = {};
+        for (var field in card) {
+          c[field.split('.').pop()] = card[field];
+        }
+        return c;
+      });
+    } else {
+      a[k] = v;
+    }
+  });
+  return a;
+}
+
+Form.prototype.getStructuredUserData = function () {
+  var flat = flatten({}, this.getUserData());
+  var struct = {};
+  var assign = function (struct, path, value) {
+    if (path.length == 1) {
+      struct[path[0]] = value;
+    } else {
+      struct[path[0]] = struct[path[0]] || {};
+      assign(struct[path[0]], path.slice(1), value);
+    }
+  };
+  Object.keys(flat).forEach(function (k) {
+    var parts = k.split(':');
+    var path = [parts[0]].concat(parts[1].split('.'));
+    console.log('assign', path, flat[k]);
+    assign(struct, path, flat[k]);
+  });
+  return struct;
+};
+
 Form.prototype.getPatchedUserData = function () {
   var profile = this.userData;
   var updated = this.getUserData();

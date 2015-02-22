@@ -189,10 +189,11 @@
     var self = this;
     this.getRelationships(function (relationships) {
       self.getConversations(relationshipId, function (conversations) {
-        self.getMessages(conversations, Object.keys(conversations)[0], function (requests) {
+        self.getRequests(conversations, function (requests) {
           var relationship = relationships[relationshipId];
           relationship.conversations = conversations;
           relationship.requests = requests;
+          relationship.user = self.user;
           cb(relationship);
         });
       });
@@ -210,9 +211,9 @@
     });
   };
 
-  SlideMobile.prototype.getMessages = function (conversations, conversationId, cb) {
+  SlideMobile.prototype.getMessages = function (conversations, conversationId, types, cb) {
     var conversation = conversations[conversationId];
-    conversation.getMessages({
+    conversation.getMessages(types, {
       success: function(ms) {
         cb(ms.map(function(m) {
           m.conversation = conversation;
@@ -224,9 +225,23 @@
       }});
   };
 
-  SlideMobile.prototype.getRequests = function (relationshipId, cb) {
-    // TODO
-    cb(FIXTURE.user.relationships.huit.requests);
+  SlideMobile.prototype.getRequests = function (conversations, cb) {
+    var done = 0;
+    var self = this;
+    var ids = Object.keys(conversations);
+    ids.forEach(function (conversationId) {
+      self.getMessages(conversations, conversationId, ['request'], function (requests) {
+        done += 1;
+        conversations[conversationId].requests = requests;
+        if (done == ids.length) {
+          var rs = [];
+          ids.forEach(function (id) {
+            rs = rs.concat(conversations[id].requests);
+          });
+          cb(rs);
+        }
+      });
+    });
   };
 
   SlideMobile.prototype.bindPushNotificationListeners = function () {
@@ -252,6 +267,8 @@
       self.$container.on('click', '.nav-bar .back-button', function () {
         self.popActivePageToMaster();
       });
+
+      self.switchToTab(0);
 
     });
     });
@@ -289,9 +306,13 @@
         return r.id == id;
       })[0];
       self.buildForm($detail2, relationship.name, request.blocks, function (form) {
-        var data = form.getUserData();
+        var data = form.getStructuredUserData();
         console.log('submitting', data);
         // TODO: better structure this data
+        request.conversation.respond(request, data, {
+          success: function (r) { console.log(r); },
+          failure: function (evt) { console.log(evt); }
+        });
       });
     });
 
