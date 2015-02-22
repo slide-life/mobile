@@ -163,11 +163,13 @@
   };
 
   SlideMobile.prototype.getRelationships = function (cb) {
-    console.log('id', this.user.id);
     var self = this;
     this.user.getRelationships({
       success: function(rs) {
         var store = {};
+        if (rs.length == 0) {
+          cb(store);
+        }
         rs.forEach(function (r) {
           Slide.Relationship.inlineReferences(r, function (r) {
             store[r.id] = r;
@@ -178,28 +180,30 @@
         });
       },
       failure: function() {
+        console.log('fail');
       } });
   };
 
   SlideMobile.prototype.getRelationship = function (relationshipId, cb) {
     var self = this;
     this.getRelationships(function (relationships) {
-      cb(relationships[relationshipId]);
-    });
-    /*
-    this.getConversations(relationshipId, function (conversations) {
-      this.getRequests(relationshipId, function (requests) {
+      self.getConversations(relationshipId, function (conversations) {
+        self.getRequests(relationshipId, function (requests) {
+          cb(relationships[relationshipId]);
+        });
       });
-    });*/
+    });
   };
 
   SlideMobile.prototype.getConversations = function (relationshipId, cb) {
+    // TODO
   };
 
   SlideMobile.prototype.getMessages = function (relationshipId, conversationId, cb) {
   };
 
   SlideMobile.prototype.getRequests = function (relationshipId, cb) {
+    // TODO
   };
 
   SlideMobile.prototype.bindPushNotificationListeners = function () {
