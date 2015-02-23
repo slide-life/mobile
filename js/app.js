@@ -288,7 +288,7 @@
       form.build(profile, {
         onSubmit: function () {
           submitForm(form);
-          self.popActivePageToMaster();
+          self.reloadPage();
         }
       });
 
@@ -401,6 +401,11 @@
       }
     });
   }
+
+  SlideMobile.prototype.reloadPage = function () {
+    var active = $('[data-page].active').data('page');
+    this.replacePage(active);
+  };
 
   SlideMobile.prototype.presentPage = function (page) {
     this.$container.attr('data-page', page);
