@@ -81,6 +81,7 @@
   };
 
   SlideMobile.prototype.getProfile = function () {
+    console.log('self.user', this.user);
     return this.user.profile;
   };
 
@@ -172,10 +173,14 @@
   };
 
   SlideMobile.prototype.patchUser = function (form, cb) {
+    var self = this;
+
     var data = { private: form.getPatchedUserData() };
-    self.user.patch(data, {
+    console.log(data);
+    this.user.patch(data, {
       success: function (user) {
-        self.profile = user.profile;
+        self.user = user;
+        console.log('self.user:', self.user);
       },
       failure: function (fail) {
         console.log('failed to patch user');

@@ -136,6 +136,7 @@ Form.prototype.remove = function() {
 
 Form.prototype.build = function (userData, options) {
   var self = this;
+  console.log('user data:', userData);
 
   this.userData = userData;
   this.options = options;
@@ -190,9 +191,8 @@ Form.prototype._isCard = function (identifier) {
   return Form.CARDS.indexOf(identifier) !== -1;
 };
 
-Form.prototype._getDataForIdentifier = function (identifier) {
-  var path = Slide.Card.getPathForField(identifier);
-  return this.userData[path.identifier] || [];
+Form.prototype._getDataForField = function (field) {
+  return this.userData[Slide.Card.normalizeField(field)] || [];
 };
 
 Form.prototype._createSlider = function (fields) {
@@ -294,7 +294,7 @@ Form.prototype.createCard = function (identifier, field) {
   var self = this;
   var $newCard = this._buildCard(identifier, field, {}).addClass('new-field').append(this._createButton());
 
-  var cards = this._getDataForIdentifier(identifier).map(function (card) {
+  var cards = this._getDataForField(identifier).map(function (card) {
     return self._buildCard(identifier, field, card);
   });
 
@@ -333,7 +333,7 @@ Form.prototype.createCompound = function (identifier, field) {
   var compound = [], self = this;
 
   $.each(fields, function (i, f) {
-    var data = self._getDataForIdentifier(i);
+    var data = self._getDataForField(i);
     var fs;
 
     if (data.length > 0) {
