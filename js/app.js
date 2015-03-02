@@ -26,84 +26,6 @@
     }
   };
 
-  var FIXTURE = {
-    user: {
-      profile: {
-        'slide.life:university.id': '428190849018301',
-        'slide.life:university.current-level': 'Freshman'
-      },
-      keys: {
-        private: 'something',
-        public: 'something',
-        symmetric: 'something'
-      },
-      relationships: {
-        'huit': {
-          id: 'huit',
-          vendor: {
-            name: 'HUIT',
-            profile: [
-              {
-                description: 'Test attribute',
-                value: 'Test'
-              }
-            ]
-          },
-          conversations: {
-            'huit-A': {
-              id: 'huit-A',
-              name: 'Sign up',
-              messages: {
-                'huit-A-0': {
-                  id: 'huit-A-0',
-                  kind: 'request',
-                  fields: [
-                    'slide.life:university'
-                  ]
-                },
-                'huit-A-1': {
-                  id: 'huit-A-1',
-                  kind: 'response',
-                  responses: {
-                    'slide.life:university.id': '428190849018301',
-                    'slide.life:university.current-level': 'Freshman'
-                  },
-                  responseTo: 'huit-A-0'
-                }
-              }
-            },
-            'huit-B': {
-              id: 'huit-B',
-              name: 'Some other request',
-              messages: {
-                'huit-B-0': {
-                  id: 'huit-B-0',
-                  kind: 'request',
-                  fields: [
-                    'slide.life:name'
-                  ]
-                }
-              }
-            }
-          },
-          requests: {
-            'huit-B-0': {
-              id: 'huit-B-0',
-              conversation: {
-                id: 'huit-B',
-                name: 'Some other request'
-              },
-              kind: 'request',
-              fields: [
-                'slide.life:name'
-              ]
-            }
-          }
-        }
-      }
-    }
-  };
-
   var SlideMobile = function (cb) {
     var self = this;
 
@@ -249,6 +171,18 @@
     });
   };
 
+  SlideMobile.prototype.patchUser = function (form, cb) {
+    var data = { private: form.getPatchedUserData() };
+    self.user.patch(data, {
+      success: function (user) {
+        self.profile = user.profile;
+      },
+      failure: function (fail) {
+        console.log('failed to patch user');
+      }
+    });
+  };
+
   SlideMobile.prototype.bindPushNotificationListeners = function () {
     var self = this;
     this.user.listen(function (message, socket) {
@@ -261,23 +195,20 @@
   SlideMobile.prototype.initializePages = function () {
     var self = this;
     this.buildPage('profile', {}, function(profile) {
-    self.buildPage('relationships', {}, function(relationships) {
+      self.buildPage('relationships', {}, function(relationships) {
+        self.pages.profile = profile;
+        self.pages.relationships = relationships;
+        $.each(self.pages, function (page, $html) {
+          self.$container.append($html);
+        });
 
-      self.pages.profile = profile;
-      self.pages.relationships = relationships;
-      $.each(self.pages, function (page, $html) {
-        self.$container.append($html);
+        self.$container.on('click', '.nav-bar .back-button', function () {
+          self.popActivePageToMaster();
+        });
+
+        self.switchToTab(0);
       });
-
-      self.$container.on('click', '.nav-bar .back-button', function () {
-        self.popActivePageToMaster();
-      });
-
-      self.switchToTab(0);
-
     });
-    });
-
   };
 
   SlideMobile.prototype.buildForm = function ($page, title, fields, submitForm) {
@@ -285,6 +216,7 @@
 
     Form.createFromIdentifiers($page.find('.body'), fields, function (form) {
       var profile = self.getProfile();
+      console.log(profile);
       form.build(profile, {
         onSubmit: function () {
           submitForm(form);
@@ -311,6 +243,9 @@
         return r.id == id;
       })[0];
       self.buildForm($detail2, relationship.name, request.blocks, function (form) {
+        self.patchUser(form, function (success) {
+          console.log('patched user');
+        });
         var data = form.getUserData();
         console.log('submitting', data);
         // TODO: better structure this data
@@ -339,13 +274,9 @@
       var category = self.categories[$(this).data('target')];
       // TODO: form needs to be populated with profile data.
       self.buildForm($detail, category.description, category.fields, function (form) {
-        var data = { private: form.getPatchedUserData() };
-        self.user.patch(data, {
-          success: function (user) {
-            self.profile = user.profile;
-          },
-          failure: function(fail) {
-          } });
+        self.patchUser(form, function (success) {
+          console.log('patched user');
+        });
       });
     });
 
