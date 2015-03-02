@@ -393,7 +393,7 @@ Form.prototype.serialize = function () {
   return JSON.stringify(this.getData());
 };
 
-Form.prototype.getUserData = function () {
+Form.prototype.getUserData = function () { //USE THIS INSTEAD TODO: switch to getStructuredUserData
   var compoundData = this._getFieldsForSelector('.compound-wrapper .field:not(.slick-cloned, .new-field)', true);
   var cardData = {},
       self = this;

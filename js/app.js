@@ -311,7 +311,7 @@
         return r.id == id;
       })[0];
       self.buildForm($detail2, relationship.name, request.blocks, function (form) {
-        var data = form.getStructuredUserData();
+        var data = form.getUserData();
         console.log('submitting', data);
         // TODO: better structure this data
         request.conversation.respond(request, data, {
