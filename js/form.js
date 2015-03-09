@@ -113,6 +113,39 @@ function deepCompare () {
   return true;
 }
 
+var assign = function (struct, path, value) {
+  if (path.length == 1) {
+    struct[path[0]] = value;
+  } else {
+    struct[path[0]] = struct[path[0]] || {};
+    assign(struct[path[0]], path.slice(1), value);
+  }
+};
+
+var patch = function (oldStruct, newStruct) {
+  if (newStruct instanceof Array) {
+    return newStruct;
+  } else if (newStruct instanceof Object) {
+    var ret = {};
+    Object.keys(newStruct).forEach(function (k) {
+      if (k in oldStruct) {
+        ret[k] = patch(oldStruct[k], newStruct[k]);
+      } else {
+        ret[k] = newStruct[k];
+      }
+    });
+    return ret;
+  } else {
+    return newStruct;
+  }
+};
+
+var access = function (struct, accessorPath) {
+  return accessorPath.reduce(function (obj, nxt) {
+    return obj[nxt] || [];
+  }, struct);
+};
+
 var Form = function ($container, fields) {
   this.fields = fields;
   this.$container = $container;
@@ -136,7 +169,6 @@ Form.prototype.remove = function() {
 
 Form.prototype.build = function (userData, options) {
   var self = this;
-  console.log('user data:', userData);
 
   this.userData = userData;
   this.options = options;
@@ -192,7 +224,8 @@ Form.prototype._isCard = function (identifier) {
 };
 
 Form.prototype._getDataForField = function (field) {
-  return this.userData[Slide.Card.normalizeField(field)] || [];
+  var ret = access(this.userData.private, Slide.Card.normalizedPath(field));
+  return ret;
 };
 
 Form.prototype._createSlider = function (fields) {
@@ -393,7 +426,7 @@ Form.prototype.serialize = function () {
   return JSON.stringify(this.getData());
 };
 
-Form.prototype.getUserData = function () { //USE THIS INSTEAD TODO: switch to getStructuredUserData
+Form.prototype.getUserData = function () {
   var compoundData = this._getFieldsForSelector('.compound-wrapper .field:not(.slick-cloned, .new-field)', true);
   var cardData = {},
       self = this;
@@ -408,7 +441,13 @@ Form.prototype.getUserData = function () { //USE THIS INSTEAD TODO: switch to ge
     });
   });
 
-  return $.extend(cardData, compoundData);
+  var flattenedResult = $.extend(cardData, compoundData);
+  var unflattened = {};
+  Object.keys(flattenedResult).forEach(function (k) {
+    var v = flattenedResult[k];
+    assign(unflattened, Slide.Card.normalizedPath(k), v);
+  });
+  return unflattened;
 };
 
 function flatten (a, obj) {
@@ -434,18 +473,9 @@ function flatten (a, obj) {
 Form.prototype.getStructuredUserData = function () {
   var flat = flatten({}, this.getUserData());
   var struct = {};
-  var assign = function (struct, path, value) {
-    if (path.length == 1) {
-      struct[path[0]] = value;
-    } else {
-      struct[path[0]] = struct[path[0]] || {};
-      assign(struct[path[0]], path.slice(1), value);
-    }
-  };
   Object.keys(flat).forEach(function (k) {
     var parts = k.split(':');
     var path = [parts[0]].concat(parts[1].split('.'));
-    console.log('assign', path, flat[k]);
     assign(struct, path, flat[k]);
   });
   return struct;
@@ -454,19 +484,6 @@ Form.prototype.getStructuredUserData = function () {
 Form.prototype.getPatchedUserData = function () {
   var profile = this.userData;
   var updated = this.getUserData();
-  var patch = {};
 
-  $.each(updated, function (identifier, key) {
-    if (!deepCompare(profile[identifier], updated[identifier])) {
-      patch[Slide.Card.normalizeField(identifier)] = updated[identifier];
-    }
-  });
-
-  return patch;
-};
-
-Form.prototype.getStringifiedPatchedUserData = function () {
-  return this.getPatchedUserData().map(function (patch) {
-    return JSON.stringify(patch);
-  });
+  return patch(profile, updated);
 };

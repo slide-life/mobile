@@ -81,7 +81,6 @@
   };
 
   SlideMobile.prototype.getProfile = function () {
-    console.log('self.user', this.user);
     return this.user.profile;
   };
 
@@ -176,10 +175,10 @@
     var self = this;
 
     var data = { private: form.getPatchedUserData() };
-    console.log(data);
     this.user.patch(data, {
       success: function (user) {
         self.user = user;
+        self.persistUser(user);
         console.log('self.user:', self.user);
       },
       failure: function (fail) {
@@ -221,7 +220,6 @@
 
     Form.createFromIdentifiers($page.find('.body'), fields, function (form) {
       var profile = self.getProfile();
-      console.log(profile);
       form.build(profile, {
         onSubmit: function () {
           submitForm(form);
@@ -252,7 +250,6 @@
           console.log('patched user');
         });
         var data = form.getUserData();
-        console.log('submitting', data);
         // TODO: better structure this data
         request.conversation.respond(request, data, {
           success: function (r) { console.log(r); },
